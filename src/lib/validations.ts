@@ -22,5 +22,26 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 })
 
+export const childSchema = z.object({
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  birthDate: z.string().optional(),
+  preferredStyle: z.string().optional(),
+  musicPreferences: z.string().optional(),
+  styleNotes: z.string().optional(),
+  specialRequirements: z.string().optional(),
+})
+
+export const bookingSchema = z.object({
+  packageId: z.string().min(1, 'Package selection is required'),
+  sessionDate: z.string().min(1, 'Session date is required'),
+  sessionTime: z.string().min(1, 'Session time is required'),
+  children: z.array(childSchema).min(1, 'At least one child is required'),
+  selectedAddons: z.array(z.string()).optional(),
+  specialRequests: z.string().optional(),
+})
+
 export type RegisterInput = z.infer<typeof registerSchema>
 export type LoginInput = z.infer<typeof loginSchema>
+export type ChildInput = z.infer<typeof childSchema>
+export type BookingInput = z.infer<typeof bookingSchema>
