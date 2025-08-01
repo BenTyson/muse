@@ -1,8 +1,8 @@
 import { loadStripe, Stripe } from '@stripe/stripe-js'
 import StripeServer from 'stripe'
 
-if (!process.env.STRIPE_PUBLISHABLE_KEY) {
-  throw new Error('STRIPE_PUBLISHABLE_KEY is not set')
+if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+  throw new Error('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not set')
 }
 
 if (!process.env.STRIPE_SECRET_KEY) {

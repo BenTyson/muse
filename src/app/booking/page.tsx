@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
@@ -90,11 +90,13 @@ function BookingForm() {
     }
   }
 
-  const updateChild = (index: number, child: ChildInput) => {
-    const updatedChildren = [...children]
-    updatedChildren[index] = child
-    setChildren(updatedChildren)
-  }
+  const updateChild = useCallback((index: number, child: ChildInput) => {
+    setChildren(prev => {
+      const updatedChildren = [...prev]
+      updatedChildren[index] = child
+      return updatedChildren
+    })
+  }, [])
 
   const removeChild = (index: number) => {
     const updatedChildren = children.filter((_, i) => i !== index)
@@ -245,7 +247,13 @@ function BookingForm() {
               
               <div className="mt-8 flex justify-end">
                 <Button
-                  onClick={() => setCurrentStep(2)}
+                  onClick={() => {
+                    // Add first child if none exist
+                    if (children.length === 0) {
+                      addChild()
+                    }
+                    setCurrentStep(2)
+                  }}
                   disabled={!selectedDate || !selectedTime}
                 >
                   Continue to Children
@@ -294,7 +302,7 @@ function BookingForm() {
                 </Button>
                 <Button
                   onClick={() => setCurrentStep(3)}
-                  disabled={children.length === 0}
+                  disabled={children.length === 0 || children.some(child => !child.firstName || !child.lastName)}
                 >
                   Continue to Review
                 </Button>
