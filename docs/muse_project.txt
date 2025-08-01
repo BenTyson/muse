@@ -1,0 +1,2593 @@
+/docs/PROJECT_BLUEPRINT.md
+markdown# Electric Muse - Master Development Blueprint
+
+## Project Overview
+
+**Concept**: Rock/punk themed children's photography studio with full e-commerce integration
+**Target**: Millennial parents seeking unique experiences for their children
+**Core Value**: Transform kids into rock stars through professional styling + photography + product fulfillment
+
+## Business Logic Flow
+
+### Customer Journey
+1. **Discovery** → Landing page with sample galleries and package info
+2. **Booking** → Package selection → Calendar → Child info → Payment plan setup
+3. **Session Day** → Check-in → Styling → Photo shoot → Immediate print
+4. **Post-Session** → Gallery access (3-5 days) → Photo selection → Product ordering
+5. **Fulfillment** → Print-on-demand processing → Shipping → Delivery tracking
+
+### Revenue Streams
+- Session packages ($199-$599 with payment plans)
+- Print products (markup on POD services)
+- Add-on services (extra styling, extended sessions)
+- Potential subscription model for repeat customers
+
+### Key Success Metrics
+- Booking conversion rate from landing page
+- Payment plan adoption rate
+- Average order value in product purchases
+- Customer lifetime value and repeat bookings
+- Social sharing and referral rates
+
+## Technical Architecture Overview
+
+### Stack Selection Rationale
+- **Next.js 14**: App router for optimal SEO and performance
+- **TypeScript**: Type safety for complex business logic
+- **Tailwind CSS**: Rapid UI development with design system
+- **PostgreSQL**: Complex relational data with JSON flexibility
+- **Stripe**: Comprehensive payment and subscription handling
+- **AWS S3**: Scalable image storage with CDN delivery
+
+### Core Technical Challenges
+1. **Payment Plan Complexity**: Multi-payment scheduling with failure handling
+2. **Photo Security**: Private galleries with controlled access
+3. **POD Integration**: Multi-vendor redundancy and order routing
+4. **Mobile Performance**: Image-heavy content on mobile devices
+5. **Admin Workflow**: Efficient photo upload and editing pipeline
+
+## Development Phases
+
+### Phase 1: Foundation (Weeks 1-2)
+- Project setup and configuration
+- Database schema implementation
+- Authentication system
+- Basic UI components and design system
+
+### Phase 2: Core Booking (Weeks 3-4)
+- Package management system
+- Calendar and availability
+- Customer registration and profiles
+- Basic payment processing
+
+### Phase 3: Advanced Payments (Week 5)
+- Payment plan implementation
+- Stripe subscription integration
+- Webhook handling and retries
+- Payment failure recovery
+
+### Phase 4: Gallery System (Weeks 6-7)
+- Photo upload and storage
+- Gallery access and security
+- Image optimization and delivery
+- Download and sharing controls
+
+### Phase 5: E-commerce (Weeks 8-9)
+- Product catalog integration
+- Shopping cart and checkout
+- Print-on-demand API integration
+- Order fulfillment tracking
+
+### Phase 6: Admin Dashboard (Week 10)
+- Session management interface
+- Photo editing workflow
+- Order processing tools
+- Analytics and reporting
+
+### Phase 7: Polish & Launch (Weeks 11-12)
+- Performance optimization
+- Mobile responsiveness
+- Error handling and edge cases
+- Testing and quality assurance
+
+## Critical Success Factors
+
+### User Experience Priorities
+1. **Mobile-first design** - Parents browse on phones
+2. **Payment flexibility** - Payment plans reduce friction
+3. **Gallery security** - Parents trust photo privacy
+4. **Product quality** - POD items must meet expectations
+5. **Communication** - Clear status updates throughout process
+
+### Technical Priorities
+1. **Performance** - Fast loading, optimized images
+2. **Reliability** - Payment processing cannot fail
+3. **Security** - Child photo protection is paramount
+4. **Scalability** - Handle growth in bookings and orders
+5. **Integration stability** - POD and payment webhooks must work
+
+### Business Priorities
+1. **Conversion optimization** - Booking flow must convert
+2. **Revenue per customer** - Upsell opportunities
+3. **Operational efficiency** - Admin tools reduce manual work
+4. **Customer retention** - Repeat bookings and referrals
+5. **Brand differentiation** - Unique rock/punk positioning
+/docs/DATABASE_SCHEMA.md
+markdown# Electric Muse - Database Schema Specification
+
+## Schema Design Principles
+
+### Normalization Strategy
+- **3rd Normal Form** for core entities
+- **JSONB fields** for flexible metadata
+- **Audit trails** for all critical operations
+- **Soft deletes** for data retention
+
+### Performance Considerations
+- **Composite indexes** on frequently queried combinations
+- **Partial indexes** for conditional queries
+- **Connection pooling** for concurrent access
+- **Read replicas** for analytics queries
+
+## Complete Entity Definitions
+
+### Users & Authentication
+```sql
+-- Core user account
+users (
+  id: UUID PRIMARY KEY,
+  email: VARCHAR(255) UNIQUE NOT NULL,
+  password_hash: VARCHAR(255),
+  first_name: VARCHAR(100) NOT NULL,
+  last_name: VARCHAR(100) NOT NULL,
+  phone: VARCHAR(20),
+  email_verified: BOOLEAN DEFAULT FALSE,
+  marketing_consent: BOOLEAN DEFAULT FALSE,
+  created_at: TIMESTAMP,
+  updated_at: TIMESTAMP,
+  deleted_at: TIMESTAMP
+)
+
+-- Password reset tokens
+password_resets (
+  id: UUID PRIMARY KEY,
+  user_id: UUID REFERENCES users(id),
+  token: VARCHAR(255) UNIQUE NOT NULL,
+  expires_at: TIMESTAMP NOT NULL,
+  used_at: TIMESTAMP,
+  created_at: TIMESTAMP
+)
+
+-- Email verification tokens
+email_verifications (
+  id: UUID PRIMARY KEY,
+  user_id: UUID REFERENCES users(id),
+  token: VARCHAR(255) UNIQUE NOT NULL,
+  expires_at: TIMESTAMP NOT NULL,
+  verified_at: TIMESTAMP,
+  created_at: TIMESTAMP
+)
+Family & Children Management
+sql-- Child profiles for sessions
+children (
+  id: UUID PRIMARY KEY,
+  parent_id: UUID REFERENCES users(id) ON DELETE CASCADE,
+  first_name: VARCHAR(100) NOT NULL,
+  last_name: VARCHAR(100) NOT NULL,
+  birth_date: DATE,
+  preferred_style: TEXT, -- rock, punk, metal, alternative
+  music_preferences: TEXT,
+  style_notes: TEXT,
+  special_requirements: TEXT, -- allergies, sensitivities
+  created_at: TIMESTAMP,
+  updated_at: TIMESTAMP,
+  deleted_at: TIMESTAMP
+)
+
+-- Family groups for multi-child sessions
+families (
+  id: UUID PRIMARY KEY,
+  primary_parent_id: UUID REFERENCES users(id),
+  family_name: VARCHAR(100),
+  notes: TEXT,
+  created_at: TIMESTAMP
+)
+
+-- Link children to families
+family_children (
+  family_id: UUID REFERENCES families(id),
+  child_id: UUID REFERENCES children(id),
+  PRIMARY KEY (family_id, child_id)
+)
+Package & Pricing System
+sql-- Photography packages
+packages (
+  id: UUID PRIMARY KEY,
+  name: VARCHAR(100) NOT NULL,
+  slug: VARCHAR(100) UNIQUE NOT NULL,
+  description: TEXT,
+  short_description: VARCHAR(255),
+  base_price: DECIMAL(10,2) NOT NULL,
+  duration_minutes: INTEGER NOT NULL,
+  max_children: INTEGER DEFAULT 1,
+  includes_styling: BOOLEAN DEFAULT TRUE,
+  max_outfit_changes: INTEGER DEFAULT 1,
+  included_photos: INTEGER DEFAULT 5,
+  photo_editing_level: VARCHAR(50), -- basic, standard, premium
+  includes_print: BOOLEAN DEFAULT TRUE,
+  print_size: VARCHAR(20), -- 4x6, 5x7, 8x10
+  active: BOOLEAN DEFAULT TRUE,
+  sort_order: INTEGER DEFAULT 0,
+  metadata: JSONB, -- additional features, restrictions
+  created_at: TIMESTAMP,
+  updated_at: TIMESTAMP
+)
+
+-- Package add-ons
+package_addons (
+  id: UUID PRIMARY KEY,
+  package_id: UUID REFERENCES packages(id),
+  name: VARCHAR(100) NOT NULL,
+  description: TEXT,
+  price: DECIMAL(10,2) NOT NULL,
+  addon_type: VARCHAR(50), -- extra_time, additional_child, premium_editing
+  active: BOOLEAN DEFAULT TRUE,
+  sort_order: INTEGER DEFAULT 0
+)
+
+-- Seasonal pricing and promotions
+package_pricing (
+  id: UUID PRIMARY KEY,
+  package_id: UUID REFERENCES packages(id),
+  price_type: VARCHAR(50), -- regular, holiday, promotion
+  price_modifier: DECIMAL(10,2), -- amount or percentage
+  modifier_type: VARCHAR(20), -- fixed, percentage
+  valid_from: DATE,
+  valid_until: DATE,
+  promo_code: VARCHAR(50),
+  max_uses: INTEGER,
+  current_uses: INTEGER DEFAULT 0,
+  active: BOOLEAN DEFAULT TRUE
+)
+Session Management
+sql-- Photography sessions
+sessions (
+  id: UUID PRIMARY KEY,
+  user_id: UUID REFERENCES users(id) ON DELETE CASCADE,
+  package_id: UUID REFERENCES packages(id),
+  session_number: VARCHAR(50) UNIQUE NOT NULL, -- human-readable ID
+  session_date: DATE NOT NULL,
+  session_time: TIME NOT NULL,
+  estimated_duration: INTEGER, -- minutes
+  status: VARCHAR(50) DEFAULT 'booked', -- booked, confirmed, in_progress, completed, cancelled, no_show, rescheduled
+  total_amount: DECIMAL(10,2) NOT NULL,
+  deposit_amount: DECIMAL(10,2) NOT NULL,
+  balance_due: DECIMAL(10,2) NOT NULL,
+  special_requests: TEXT,
+  preparation_notes: TEXT, -- sent to customer before session
+  styling_notes: TEXT, -- for styling team
+  photographer_notes: TEXT,
+  completion_notes: TEXT, -- post-session summary
+  created_at: TIMESTAMP,
+  updated_at: TIMESTAMP,
+  cancelled_at: TIMESTAMP,
+  cancellation_reason: TEXT
+)
+
+-- Children attending each session
+session_children (
+  session_id: UUID REFERENCES sessions(id) ON DELETE CASCADE,
+  child_id: UUID REFERENCES children(id),
+  primary_child: BOOLEAN DEFAULT FALSE,
+  styling_requests: TEXT,
+  completed_styling: BOOLEAN DEFAULT FALSE,
+  PRIMARY KEY (session_id, child_id)
+)
+
+-- Session add-ons purchased
+session_addons (
+  id: UUID PRIMARY KEY,
+  session_id: UUID REFERENCES sessions(id) ON DELETE CASCADE,
+  addon_id: UUID REFERENCES package_addons(id),
+  quantity: INTEGER DEFAULT 1,
+  unit_price: DECIMAL(10,2) NOT NULL,
+  total_price: DECIMAL(10,2) NOT NULL
+)
+
+-- Session status history
+session_status_history (
+  id: UUID PRIMARY KEY,
+  session_id: UUID REFERENCES sessions(id) ON DELETE CASCADE,
+  old_status: VARCHAR(50),
+  new_status: VARCHAR(50) NOT NULL,
+  reason: TEXT,
+  changed_by: UUID REFERENCES users(id),
+  changed_at: TIMESTAMP DEFAULT NOW()
+)
+Payment Processing
+sql-- Payment plans for sessions
+payment_plans (
+  id: UUID PRIMARY KEY,
+  session_id: UUID REFERENCES sessions(id) ON DELETE CASCADE,
+  stripe_subscription_id: VARCHAR(255),
+  stripe_customer_id: VARCHAR(255),
+  plan_type: VARCHAR(20) NOT NULL, -- full, 2_pay, 3_pay, 4_pay
+  total_amount: DECIMAL(10,2) NOT NULL,
+  amount_per_payment: DECIMAL(10,2),
+  payments_total: INTEGER,
+  payments_completed: INTEGER DEFAULT 0,
+  payments_remaining: INTEGER,
+  next_payment_date: DATE,
+  status: VARCHAR(50) DEFAULT 'active', -- active, completed, failed, cancelled, paused
+  failure_count: INTEGER DEFAULT 0,
+  created_at: TIMESTAMP,
+  updated_at: TIMESTAMP
+)
+
+-- Individual payment transactions
+payments (
+  id: UUID PRIMARY KEY,
+  session_id: UUID REFERENCES sessions(id),
+  order_id: UUID REFERENCES orders(id),
+  payment_plan_id: UUID REFERENCES payment_plans(id),
+  stripe_payment_intent_id: VARCHAR(255),
+  stripe_charge_id: VARCHAR(255),
+  amount: DECIMAL(10,2) NOT NULL,
+  payment_type: VARCHAR(50) NOT NULL, -- deposit, balance, plan_payment, product_purchase, refund
+  payment_method: VARCHAR(50), -- card, bank_transfer, cash
+  status: VARCHAR(50) DEFAULT 'pending', -- pending, processing, succeeded, failed, refunded, disputed
+  failure_reason: TEXT,
+  failure_code: VARCHAR(100),
+  refund_amount: DECIMAL(10,2) DEFAULT 0,
+  refund_reason: TEXT,
+  processed_at: TIMESTAMP,
+  created_at: TIMESTAMP,
+  updated_at: TIMESTAMP
+)
+
+-- Payment method storage (for repeat customers)
+customer_payment_methods (
+  id: UUID PRIMARY KEY,
+  user_id: UUID REFERENCES users(id) ON DELETE CASCADE,
+  stripe_payment_method_id: VARCHAR(255) NOT NULL,
+  type: VARCHAR(50), -- card, bank_account
+  last_four: VARCHAR(4),
+  brand: VARCHAR(50), -- visa, mastercard, amex
+  exp_month: INTEGER,
+  exp_year: INTEGER,
+  is_default: BOOLEAN DEFAULT FALSE,
+  active: BOOLEAN DEFAULT TRUE,
+  created_at: TIMESTAMP
+)
+Gallery & Photo Management
+sql-- Photo galleries for each session
+galleries (
+  id: UUID PRIMARY KEY,
+  session_id: UUID REFERENCES sessions(id) ON DELETE CASCADE,
+  name: VARCHAR(255) NOT NULL,
+  slug: VARCHAR(255) UNIQUE NOT NULL,
+  access_code: VARCHAR(50) UNIQUE,
+  password_hash: VARCHAR(255), -- optional password protection
+  public_share_enabled: BOOLEAN DEFAULT FALSE,
+  download_enabled: BOOLEAN DEFAULT TRUE,
+  social_share_enabled: BOOLEAN DEFAULT TRUE,
+  watermark_enabled: BOOLEAN DEFAULT TRUE,
+  expires_at: TIMESTAMP,
+  view_count: INTEGER DEFAULT 0,
+  download_count: INTEGER DEFAULT 0,
+  created_at: TIMESTAMP,
+  updated_at: TIMESTAMP
+)
+
+-- Individual photos in galleries
+photos (
+  id: UUID PRIMARY KEY,
+  gallery_id: UUID REFERENCES galleries(id) ON DELETE CASCADE,
+  filename: VARCHAR(255) NOT NULL,
+  original_filename: VARCHAR(255),
+  alt_text: VARCHAR(255),
+  file_size: BIGINT,
+  width: INTEGER,
+  height: INTEGER,
+  mime_type: VARCHAR(100),
+  s3_key: VARCHAR(500) NOT NULL,
+  s3_thumbnail_key: VARCHAR(500),
+  s3_watermark_key: VARCHAR(500),
+  editing_status: VARCHAR(50) DEFAULT 'raw', -- raw, editing, edited, approved, rejected
+  is_complimentary: BOOLEAN DEFAULT FALSE, -- the free print photo
+  is_featured: BOOLEAN DEFAULT FALSE,
+  sort_order: INTEGER DEFAULT 0,
+  photographer_notes: TEXT,
+  editing_notes: TEXT,
+  metadata: JSONB, -- EXIF data, editing history, etc
+  created_at: TIMESTAMP,
+  updated_at: TIMESTAMP,
+  deleted_at: TIMESTAMP
+)
+
+-- Photo editing workflow
+photo_edits (
+  id: UUID PRIMARY KEY,
+  photo_id: UUID REFERENCES photos(id) ON DELETE CASCADE,
+  editor_id: UUID REFERENCES users(id),
+  edit_type: VARCHAR(50), -- color_correction, retouching, effects
+  edit_description: TEXT,
+  before_s3_key: VARCHAR(500),
+  after_s3_key: VARCHAR(500),
+  approved: BOOLEAN,
+  approved_by: UUID REFERENCES users(id),
+  approved_at: TIMESTAMP,
+  created_at: TIMESTAMP
+)
+
+-- Customer photo favorites and selections
+photo_selections (
+  id: UUID PRIMARY KEY,
+  photo_id: UUID REFERENCES photos(id) ON DELETE CASCADE,
+  user_id: UUID REFERENCES users(id) ON DELETE CASCADE,
+  selection_type: VARCHAR(50), -- favorite, cart, purchased
+  notes: TEXT,
+  created_at: TIMESTAMP,
+  UNIQUE(photo_id, user_id, selection_type)
+)
+Product Catalog & E-commerce
+sql-- Print product catalog
+products (
+  id: UUID PRIMARY KEY,
+  name: VARCHAR(255) NOT NULL,
+  slug: VARCHAR(255) UNIQUE NOT NULL,
+  description: TEXT,
+  short_description: VARCHAR(255),
+  category: VARCHAR(100) NOT NULL, -- prints, canvas, metal, apparel, accessories, home_decor
+  subcategory: VARCHAR(100),
+  base_price: DECIMAL(10,2) NOT NULL,
+  printful_product_id: VARCHAR(100),
+  gooten_product_id: VARCHAR(100),
+  product_image: VARCHAR(500), -- mockup image
+  size_options: JSONB, -- array of size objects
+  material_options: JSONB,
+  color_options: JSONB,
+  customization_options: JSONB, -- text, borders, effects
+  active: BOOLEAN DEFAULT TRUE,
+  featured: BOOLEAN DEFAULT FALSE,
+  sort_order: INTEGER DEFAULT 0,
+  metadata: JSONB,
+  created_at: TIMESTAMP,
+  updated_at: TIMESTAMP
+)
+
+-- Product variants (size/material combinations)
+product_variants (
+  id: UUID PRIMARY KEY,
+  product_id: UUID REFERENCES products(id) ON DELETE CASCADE,
+  sku: VARCHAR(100) UNIQUE NOT NULL,
+  name: VARCHAR(255) NOT NULL, -- "16x20 Canvas Print"
+  size: VARCHAR(50),
+  material: VARCHAR(50),
+  color: VARCHAR(50),
+  price: DECIMAL(10,2) NOT NULL,
+  printful_variant_id: VARCHAR(100),
+  gooten_variant_id: VARCHAR(100),
+  active: BOOLEAN DEFAULT TRUE,
+  sort_order: INTEGER DEFAULT 0
+)
+
+-- Customer orders
+orders (
+  id: UUID PRIMARY KEY,
+  user_id: UUID REFERENCES users(id) ON DELETE CASCADE,
+  session_id: UUID REFERENCES sessions(id),
+  order_number: VARCHAR(50) UNIQUE NOT NULL,
+  status: VARCHAR(50) DEFAULT 'pending', -- pending, processing, printed, shipped, delivered, cancelled, refunded
+  subtotal: DECIMAL(10,2) NOT NULL,
+  tax_amount: DECIMAL(10,2) DEFAULT 0,
+  shipping_amount: DECIMAL(10,2) DEFAULT 0,
+  discount_amount: DECIMAL(10,2) DEFAULT 0,
+  total_amount: DECIMAL(10,2) NOT NULL,
+  currency: VARCHAR(3) DEFAULT 'USD',
+  shipping_address: JSONB NOT NULL,
+  billing_address: JSONB,
+  stripe_payment_intent_id: VARCHAR(255),
+  tracking_numbers: JSONB, -- array of tracking info
+  estimated_delivery: DATE,
+  delivered_at: TIMESTAMP,
+  notes: TEXT,
+  created_at: TIMESTAMP,
+  updated_at: TIMESTAMP
+)
+
+-- Items within each order
+order_items (
+  id: UUID PRIMARY KEY,
+  order_id: UUID REFERENCES orders(id) ON DELETE CASCADE,
+  photo_id: UUID REFERENCES photos(id) ON DELETE CASCADE,
+  product_variant_id: UUID REFERENCES product_variants(id),
+  quantity: INTEGER NOT NULL DEFAULT 1,
+  unit_price: DECIMAL(10,2) NOT NULL,
+  total_price: DECIMAL(10,2) NOT NULL,
+  customization_data: JSONB, -- size, text, effects applied
+  printful_order_id: VARCHAR(255),
+  gooten_order_id: VARCHAR(255),
+  fulfillment_status: VARCHAR(50) DEFAULT 'pending',
+  fulfillment_provider: VARCHAR(50), -- printful, gooten
+  tracking_number: VARCHAR(255),
+  created_at: TIMESTAMP,
+  updated_at: TIMESTAMP
+)
+System Configuration
+sql-- Application settings
+settings (
+  id: UUID PRIMARY KEY,
+  category: VARCHAR(100) NOT NULL,
+  key: VARCHAR(255) NOT NULL,
+  value: TEXT,
+  value_type: VARCHAR(50) DEFAULT 'string', -- string, number, boolean, json
+  description: TEXT,
+  is_public: BOOLEAN DEFAULT FALSE, -- can be exposed to frontend
+  updated_by: UUID REFERENCES users(id),
+  updated_at: TIMESTAMP DEFAULT NOW(),
+  UNIQUE(category, key)
+)
+
+-- Audit trail for all critical operations
+audit_logs (
+  id: UUID PRIMARY KEY,
+  user_id: UUID REFERENCES users(id),
+  action: VARCHAR(100) NOT NULL,
+  resource_type: VARCHAR(100),
+  resource_id: UUID,
+  old_values: JSONB,
+  new_values: JSONB,
+  ip_address: INET,
+  user_agent: TEXT,
+  session_id: VARCHAR(255),
+  created_at: TIMESTAMP DEFAULT NOW()
+)
+
+-- System notifications and alerts
+notifications (
+  id: UUID PRIMARY KEY,
+  user_id: UUID REFERENCES users(id),
+  type: VARCHAR(50) NOT NULL, -- email, sms, push, in_app
+  title: VARCHAR(255) NOT NULL,
+  message: TEXT NOT NULL,
+  action_url: VARCHAR(500),
+  status: VARCHAR(50) DEFAULT 'pending', -- pending, sent, delivered, failed, read
+  sent_at: TIMESTAMP,
+  read_at: TIMESTAMP,
+  metadata: JSONB,
+  created_at: TIMESTAMP
+)
+Index Strategy
+Performance Indexes
+sql-- User lookups
+CREATE INDEX idx_users_email ON users(email) WHERE deleted_at IS NULL;
+CREATE INDEX idx_users_created_at ON users(created_at);
+
+-- Session queries
+CREATE INDEX idx_sessions_user_date ON sessions(user_id, session_date) WHERE status != 'cancelled';
+CREATE INDEX idx_sessions_date_status ON sessions(session_date, status);
+CREATE INDEX idx_sessions_status ON sessions(status) WHERE status IN ('booked', 'confirmed');
+
+-- Photo gallery access
+CREATE INDEX idx_galleries_access_code ON galleries(access_code) WHERE access_code IS NOT NULL;
+CREATE INDEX idx_photos_gallery_order ON photos(gallery_id, sort_order) WHERE deleted_at IS NULL;
+
+-- Payment processing
+CREATE INDEX idx_payments_stripe_intent ON payments(stripe_payment_intent_id);
+CREATE INDEX idx_payment_plans_next_payment ON payment_plans(next_payment_date) WHERE status = 'active';
+
+-- Order fulfillment
+CREATE INDEX idx_orders_status_created ON orders(status, created_at);
+CREATE INDEX idx_order_items_fulfillment ON order_items(fulfillment_status, created_at);
+
+-- Audit and analytics
+CREATE INDEX idx_audit_logs_user_action ON audit_logs(user_id, action, created_at);
+CREATE INDEX idx_audit_logs_resource ON audit_logs(resource_type, resource_id, created_at);
+Data Relationships Summary
+One-to-Many Relationships
+
+Users → Children (1:N)
+Users → Sessions (1:N)
+Sessions → Galleries (1:1)
+Galleries → Photos (1:N)
+Sessions → Payment Plans (1:1)
+Users → Orders (1:N)
+Orders → Order Items (1:N)
+
+Many-to-Many Relationships
+
+Sessions ↔ Children (via session_children)
+Photos ↔ Products (via order_items)
+Users ↔ Photos (via photo_selections)
+
+Critical Constraints
+
+No session can be double-booked (unique session_date + session_time)
+Payment plans must sum to session total
+Photo access requires valid gallery access
+Orders require completed payment before fulfillment
+
+
+## `/docs/LIBRARIES_AND_DEPENDENCIES.md`
+
+```markdown
+# Electric Muse - Complete Dependencies Specification
+
+## Core Framework Dependencies
+
+### Next.js Ecosystem
+```json
+{
+  "next": "^14.0.0",
+  "@next/bundle-analyzer": "^14.0.0",
+  "eslint-config-next": "^14.0.0"
+}
+Rationale: Next.js 14 with App Router for:
+
+Server-side rendering for SEO
+Image optimization for photo galleries
+API routes for backend logic
+Built-in performance optimizations
+
+TypeScript Configuration
+json{
+  "typescript": "^5.0.0",
+  "@types/node": "^20.0.0",
+  "@types/react": "^18.0.0",
+  "@types/react-dom": "^18.0.0"
+}
+Usage: Full type safety across:
+
+Database schemas with Prisma
+API request/response types
+Component props and state
+Third-party service integrations
+
+Database & ORM
+Prisma Stack
+json{
+  "prisma": "^5.0.0",
+  "@prisma/client": "^5.0.0"
+}
+Configuration Requirements:
+
+PostgreSQL provider
+Generated types for all tables
+Migration system for schema changes
+Seed scripts for initial data
+
+Database Connection
+json{
+  "pg": "^8.11.0",
+  "@types/pg": "^8.10.0"
+}
+Purpose: Direct PostgreSQL connection for:
+
+Complex queries not suitable for Prisma
+Performance-critical operations
+Raw SQL execution when needed
+
+Authentication & Security
+NextAuth.js
+json{
+  "next-auth": "^4.24.0",
+  "@next-auth/prisma-adapter": "^1.0.7"
+}
+Providers Configuration:
+
+Credentials provider for email/password
+Google OAuth for social login
+Database session storage
+JWT token handling
+
+Password Security
+json{
+  "bcryptjs": "^2.4.3",
+  "@types/bcryptjs": "^2.4.6"
+}
+Implementation: Secure password hashing with:
+
+Salt rounds configuration (12+)
+Async hashing for performance
+Secure comparison methods
+
+Validation & Sanitization
+json{
+  "zod": "^3.22.0",
+  "validator": "^13.11.0",
+  "@types/validator": "^13.11.8"
+}
+Zod Schemas Needed:
+
+User registration/login forms
+Session booking forms
+Payment processing forms
+Photo upload validation
+Order creation validation
+
+Payment Processing
+Stripe Integration
+json{
+  "stripe": "^14.0.0",
+  "@stripe/stripe-js": "^2.1.0"
+}
+Required Stripe Features:
+
+Payment Intents for one-time payments
+Subscriptions for payment plans
+Webhooks for status updates
+Customer management
+Payment method storage
+
+Stripe React Components
+json{
+  "@stripe/react-stripe-js": "^2.4.0"
+}
+Components Needed:
+
+CardElement for payment forms
+Payment plan selection
+Saved payment methods
+Subscription management
+
+UI Framework & Styling
+Tailwind CSS
+json{
+  "tailwindcss": "^3.3.0",
+  "autoprefixer": "^10.4.16",
+  "postcss": "^8.4.32"
+}
+Custom Configuration:
+
+Electric Muse color palette
+Rock/punk themed fonts
+Custom component classes
+Responsive breakpoints
+Dark mode support
+
+Headless UI Components
+json{
+  "@headlessui/react": "^1.7.17"
+}
+Components to Use:
+
+Modal dialogs for photo viewing
+Dropdown menus for navigation
+Toggle switches for settings
+Combobox for search functionality
+
+Icon Library
+json{
+  "lucide-react": "^0.294.0"
+}
+Required Icons:
+
+Navigation (menu, close, back)
+Actions (edit, delete, download, share)
+Status (check, warning, error, loading)
+Media (camera, image, video, music)
+
+Animation & Interactions
+Framer Motion
+json{
+  "framer-motion": "^10.16.0"
+}
+Animation Patterns:
+
+Page transitions and loading states
+Photo gallery hover effects
+Button hover and click animations
+Mobile gesture interactions
+Scroll-triggered animations
+
+Form Handling
+React Hook Form
+json{
+  "react-hook-form": "^7.48.0",
+  "@hookform/resolvers": "^3.3.0"
+}
+Form Types Required:
+
+Multi-step booking form
+User registration with validation
+Child profile management
+Photo selection interface
+Order checkout process
+
+State Management & Data Fetching
+SWR for API State
+json{
+  "swr": "^2.2.4"
+}
+Data Fetching Patterns:
+
+Session data with real-time updates
+Photo galleries with caching
+Order status monitoring
+User profile synchronization
+
+React Query Alternative
+json{
+  "@tanstack/react-query": "^5.0.0"
+}
+Note: Choose either SWR or React Query based on:
+
+SWR: Simpler setup, good caching
+React Query: More features, complex state
+
+File Upload & Media Handling
+AWS SDK
+json{
+  "aws-sdk": "^2.1481.0",
+  "@aws-sdk/client-s3": "^3.0.0",
+  "@aws-sdk/s3-request-presigner": "^3.0.0"
+}
+S3 Operations Needed:
+
+Direct upload from admin panel
+Presigned URLs for secure access
+Image optimization pipeline
+CDN integration with CloudFront
+
+Image Processing
+json{
+  "sharp": "^0.32.6"
+}
+Image Operations:
+
+Thumbnail generation
+Watermark application
+Format conversion (WebP, AVIF)
+Compression for web delivery
+
+Email & Communications
+Email Service
+json{
+  "@sendgrid/mail": "^8.1.0"
+}
+Email Templates Needed:
+
+Booking confirmation
+Session reminders
+Gallery access notifications
+Order confirmations
+Payment reminders
+
+SMS Integration (Optional)
+json{
+  "twilio": "^4.19.0"
+}
+SMS Use Cases:
+
+Session day reminders
+Payment failure notifications
+Order shipping updates
+
+Print-on-Demand Integration
+HTTP Client
+json{
+  "axios": "^1.6.0"
+}
+API Integrations:
+
+Printful product sync
+Gooten order placement
+Webhook payload verification
+Retry logic for failed requests
+
+Custom POD Wrapper
+json{
+  "node-cron": "^3.0.3"
+}
+Scheduled Tasks:
+
+Product catalog synchronization
+Order status polling
+Inventory level checks
+Price update monitoring
+
+Development & Build Tools
+Code Quality
+json{
+  "eslint": "^8.54.0",
+  "prettier": "^3.1.0",
+  "@typescript-eslint/eslint-plugin": "^6.12.0",
+  "@typescript-eslint/parser": "^6.12.0"
+}
+Linting Rules:
+
+TypeScript strict mode
+React hooks rules
+Import organization
+Accessibility checks
+
+Testing Framework
+json{
+  "jest": "^29.7.0",
+  "@testing-library/react": "^14.1.0",
+  "@testing-library/jest-dom": "^6.1.0",
+  "playwright": "^1.40.0"
+}
+Testing Strategy:
+
+Unit tests for utility functions
+Component testing for UI
+Integration tests for API routes
+E2E tests for critical user flows
+
+Performance Monitoring
+json{
+  "@vercel/analytics": "^1.1.0",
+  "@sentry/nextjs": "^7.81.0"
+}
+Monitoring Setup:
+
+Real user monitoring
+Error tracking and alerting
+Performance metrics
+User behavior analytics
+
+Utility Libraries
+Date Handling
+json{
+  "date-fns": "^2.30.0"
+}
+Date Operations:
+
+Session scheduling
+Payment plan calculations
+Gallery expiration
+Timezone handling
+
+Utility Functions
+json{
+  "lodash": "^4.17.21",
+  "@types/lodash": "^4.14.202"
+}
+Common Operations:
+
+Object manipulation
+Array processing
+Debouncing and throttling
+Deep cloning and comparison
+
+Text Processing
+json{
+  "slugify": "^RetryBTContinueEditjson{
+ "slugify": "^1.6.6",
+ "he": "^1.2.0",
+ "dompurify": "^3.0.5",
+ "@types/dompurify": "^3.0.5"
+}
+Text Operations:
+
+URL-safe slugs for galleries
+HTML entity encoding/decoding
+Content sanitization for user input
+Search string normalization
+
+File Handling
+json{
+  "mime-types": "^2.1.35",
+  "@types/mime-types": "^2.1.4",
+  "file-type": "^18.7.0"
+}
+File Operations:
+
+MIME type detection
+File extension validation
+Image format verification
+Upload security checks
+
+Environment & Configuration
+Environment Management
+json{
+  "dotenv": "^16.3.1",
+  "envalid": "^8.0.0"
+}
+Environment Variables Required:
+typescript// Database
+DATABASE_URL: string
+DATABASE_POOL_SIZE: number
+
+// Authentication
+NEXTAUTH_SECRET: string
+NEXTAUTH_URL: string
+GOOGLE_CLIENT_ID: string
+GOOGLE_CLIENT_SECRET: string
+
+// Stripe
+STRIPE_PUBLISHABLE_KEY: string
+STRIPE_SECRET_KEY: string
+STRIPE_WEBHOOK_SECRET: string
+
+// AWS
+AWS_ACCESS_KEY_ID: string
+AWS_SECRET_ACCESS_KEY: string
+AWS_REGION: string
+AWS_S3_BUCKET: string
+AWS_CLOUDFRONT_DOMAIN: string
+
+// Email
+SENDGRID_API_KEY: string
+FROM_EMAIL: string
+
+// SMS (Optional)
+TWILIO_ACCOUNT_SID: string
+TWILIO_AUTH_TOKEN: string
+TWILIO_PHONE_NUMBER: string
+
+// Print-on-Demand
+PRINTFUL_API_KEY: string
+GOOTEN_API_KEY: string
+
+// Monitoring
+SENTRY_DSN: string
+VERCEL_ANALYTICS_ID: string
+
+// App Configuration
+NEXT_PUBLIC_APP_URL: string
+ADMIN_EMAIL: string
+SESSION_TIMEOUT: number
+GALLERY_EXPIRY_DAYS: number
+Development Dependencies
+Build & Bundling
+json{
+  "webpack": "^5.89.0",
+  "@types/webpack": "^5.28.5",
+  "webpack-bundle-analyzer": "^4.10.0"
+}
+Build Optimizations:
+
+Code splitting by route
+Image optimization pipeline
+Bundle size monitoring
+Tree shaking for unused code
+
+Git Hooks & Quality Gates
+json{
+  "husky": "^8.0.3",
+  "lint-staged": "^15.1.0",
+  "commitizen": "^4.3.0",
+  "@commitlint/cli": "^18.4.0",
+  "@commitlint/config-conventional": "^18.4.0"
+}
+Quality Gates:
+
+Pre-commit linting and formatting
+Conventional commit messages
+Test execution before push
+TypeScript compilation checks
+
+Package.json Scripts
+json{
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "format": "prettier --write .",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
+    "db:migrate": "prisma migrate dev",
+    "db:generate": "prisma generate",
+    "db:studio": "prisma studio",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:reset": "prisma migrate reset",
+    "analyze": "ANALYZE=true next build",
+    "prepare": "husky install"
+  }
+}
+Critical Integration Notes
+Stripe Configuration Requirements
+
+Enable webhooks for payment events
+Configure payment methods (cards, ACH)
+Set up subscription billing cycles
+Configure tax calculation
+Enable dispute handling
+
+AWS S3 Security Setup
+
+IAM roles with minimal permissions
+CORS configuration for uploads
+Bucket policies for public access
+CloudFront distribution setup
+Lifecycle policies for storage optimization
+
+Print-on-Demand API Limits
+
+Printful: 120 requests/minute
+Gooten: Rate limits vary by endpoint
+Implement exponential backoff
+Queue system for bulk operations
+Webhook verification for both services
+
+Database Performance Considerations
+
+Connection pooling configuration
+Query optimization for photo galleries
+Indexing strategy for search operations
+Backup and recovery procedures
+Monitoring for slow queries
+
+Security Dependencies Additional Notes
+
+Regular security audits with npm audit
+Dependabot for automatic updates
+OWASP security headers configuration
+Rate limiting for API endpoints
+Input validation on all user data
+
+
+## `/docs/IMPLEMENTATION_ROADMAP.md`
+
+```markdown
+# Electric Muse - Step-by-Step Implementation Roadmap
+
+## Phase 1: Project Foundation (Week 1)
+
+### Day 1-2: Project Setup
+**Goal**: Complete development environment setup
+
+**Tasks**:
+1. **Initialize Next.js Project**
+   - Create new Next.js 14 project with TypeScript
+   - Configure app router structure
+   - Set up basic folder architecture
+   - Install and configure Tailwind CSS
+   - Set up ESLint and Prettier
+
+2. **Database Setup**
+   - Install PostgreSQL locally or configure cloud instance
+   - Install Prisma and configure connection
+   - Create initial schema file structure
+   - Set up migration system
+
+3. **Environment Configuration**
+   - Create comprehensive .env.example
+   - Set up environment validation with envalid
+   - Configure development environment variables
+   - Set up Git hooks with Husky
+
+**Deliverables**:
+- [ ] Working Next.js application at localhost:3000
+- [ ] Database connection established
+- [ ] All development tools configured
+- [ ] Git repository with proper branch protection
+
+### Day 3-4: Core Database Schema
+**Goal**: Implement complete database structure
+
+**Tasks**:
+1. **Create Core Tables**
+   - Users and authentication tables
+   - Children and family management
+   - Package and pricing system
+   - Session management tables
+
+2. **Implement Relationships**
+   - Foreign key constraints
+   - Junction tables for many-to-many
+   - Cascade delete rules
+   - Index optimization
+
+3. **Seed Initial Data**
+   - Photography packages
+   - Product catalog
+   - Admin user account
+   - Sample data for development
+
+**Deliverables**:
+- [ ] Complete database schema deployed
+- [ ] Prisma client generated
+- [ ] Seed script functional
+- [ ] Database indexes optimized
+
+### Day 5-7: Authentication System
+**Goal**: Secure user authentication and authorization
+
+**Tasks**:
+1. **NextAuth.js Setup**
+   - Configure providers (credentials, Google)
+   - Set up database adapter
+   - Implement session management
+   - Create authentication middleware
+
+2. **User Registration Flow**
+   - Registration form with validation
+   - Email verification system
+   - Password reset functionality
+   - Account activation process
+
+3. **Security Implementation**
+   - Password hashing with bcrypt
+   - Input validation with Zod
+   - Rate limiting for auth endpoints
+   - CSRF protection
+
+**Deliverables**:
+- [ ] User registration working
+- [ ] Login/logout functional
+- [ ] Email verification active
+- [ ] Password reset working
+- [ ] Session management secure
+
+## Phase 2: UI Foundation & Design System (Week 2)
+
+### Day 8-9: Design System Implementation
+**Goal**: Complete UI component library
+
+**Tasks**:
+1. **Tailwind Configuration**
+   - Custom color palette (electric red, punk purple, etc.)
+   - Typography system (rock fonts + readable body)
+   - Component utility classes
+   - Responsive breakpoint system
+
+2. **Base UI Components**
+   - Button variants (electric, neon, outline)
+   - Input components with validation states
+   - Modal and dialog components
+   - Loading states and spinners
+
+3. **Layout Components**
+   - Header with navigation
+   - Footer with contact info
+   - Sidebar for admin dashboard
+   - Mobile menu implementation
+
+**Deliverables**:
+- [ ] Complete component library
+- [ ] Storybook documentation (optional)
+- [ ] Design system tokens defined
+- [ ] Responsive layouts working
+
+### Day 10-11: Homepage & Marketing Pages
+**Goal**: Compelling landing page that converts visitors
+
+**Tasks**:
+1. **Homepage Design**
+   - Hero section with sample photos
+   - Package showcase with pricing
+   - Transformation gallery (before/after)
+   - Social proof and testimonials
+
+2. **Supporting Pages**
+   - About page with studio story
+   - FAQ with common questions
+   - Contact and location information
+   - Gallery showcase page
+
+3. **SEO Optimization**
+   - Meta tags and structured data
+   - Image alt text and captions
+   - Page speed optimization
+   - Mobile performance tuning
+
+**Deliverables**:
+- [ ] Homepage converting visitors
+- [ ] Supporting marketing pages
+- [ ] SEO optimized content
+- [ ] Mobile-first responsive design
+
+### Day 12-14: Booking Flow UI
+**Goal**: Intuitive booking experience
+
+**Tasks**:
+1. **Package Selection**
+   - Package comparison interface
+   - Pricing calculator with add-ons
+   - Package details and inclusions
+   - Mobile-optimized selection
+
+2. **Calendar Integration**
+   - Available time slot display
+   - Date picker component
+   - Time selection interface
+   - Availability checking
+
+3. **Customer Information**
+   - Multi-step form design
+   - Child profile creation
+   - Special requests handling
+   - Form validation and error states
+
+**Deliverables**:
+- [ ] Package selection working
+- [ ] Calendar booking interface
+- [ ] Customer information forms
+- [ ] Mobile booking experience
+
+## Phase 3: Core Booking System (Week 3)
+
+### Day 15-17: Booking Logic Implementation
+**Goal**: Complete booking system backend
+
+**Tasks**:
+1. **Package Management**
+   - CRUD operations for packages
+   - Pricing calculation logic
+   - Add-on handling system
+   - Package availability rules
+
+2. **Calendar & Scheduling**
+   - Availability checking algorithm
+   - Time slot management
+   - Double-booking prevention
+   - Booking conflict resolution
+
+3. **Session Management**
+   - Session creation workflow
+   - Status tracking system
+   - Booking modification handling
+   - Cancellation policies
+
+**Deliverables**:
+- [ ] Package management complete
+- [ ] Calendar system functional
+- [ ] Session booking working
+- [ ] Conflict prevention active
+
+### Day 18-19: Customer Dashboard
+**Goal**: Customer portal for session management
+
+**Tasks**:
+1. **Dashboard Overview**
+   - Upcoming sessions display
+   - Session history timeline
+   - Quick action buttons
+   - Status notifications
+
+2. **Session Details**
+   - Session information display
+   - Preparation instructions
+   - Modification requests
+   - Contact information
+
+3. **Profile Management**
+   - Account settings
+   - Child profile updates
+   - Notification preferences
+   - Password changes
+
+**Deliverables**:
+- [ ] Customer dashboard functional
+- [ ] Session management working
+- [ ] Profile updates active
+- [ ] Notification system basic
+
+### Day 20-21: Basic Payment Integration
+**Goal**: Simple payment processing
+
+**Tasks**:
+1. **Stripe Setup**
+   - Payment Intent creation
+   - Basic checkout flow
+   - Success/failure handling
+   - Webhook endpoint creation
+
+2. **Payment Forms**
+   - Stripe Elements integration
+   - Payment method validation
+   - Error handling and retry
+   - Receipt generation
+
+3. **Transaction Tracking**
+   - Payment record creation
+   - Status synchronization
+   - Basic reporting
+   - Refund handling
+
+**Deliverables**:
+- [ ] Basic payments working
+- [ ] Stripe integration complete
+- [ ] Transaction records maintained
+- [ ] Webhook handling functional
+
+## Phase 4: Advanced Payment System (Week 4)
+
+### Day 22-24: Payment Plans Implementation
+**Goal**: Flexible payment plan system
+
+**Tasks**:
+1. **Subscription Setup**
+   - Stripe subscription creation
+   - Payment plan calculation
+   - Schedule management
+   - Plan modification handling
+
+2. **Payment Plan UI**
+   - Plan selection interface
+   - Payment schedule display
+   - Modification requests
+   - Payment history
+
+3. **Automated Processing**
+   - Scheduled payment execution
+   - Failure handling and retry
+   - Customer notifications
+   - Account suspension logic
+
+**Deliverables**:
+- [ ] Payment plans functional
+- [ ] Subscription management working
+- [ ] Automated processing active
+- [ ] Failure recovery implemented
+
+### Day 25-26: Payment Management
+**Goal**: Complete payment administration
+
+**Tasks**:
+1. **Admin Payment Tools**
+   - Payment tracking dashboard
+   - Manual payment processing
+   - Refund management
+   - Dispute handling
+
+2. **Customer Payment Portal**
+   - Payment method management
+   - Payment history view
+   - Receipt downloads
+   - Plan modifications
+
+3. **Reporting & Analytics**
+   - Revenue reporting
+   - Payment plan performance
+   - Failed payment analysis
+   - Customer payment behavior
+
+**Deliverables**:
+- [ ] Admin payment tools complete
+- [ ] Customer payment portal functional
+- [ ] Reporting system basic
+- [ ] Analytics tracking active
+
+### Day 27-28: Payment Security & Testing
+**Goal**: Secure and reliable payment processing
+
+**Tasks**:
+1. **Security Hardening**
+   - PCI compliance verification
+   - Webhook signature validation
+   - Secure data handling
+   - Audit trail implementation
+
+2. **Error Handling**
+   - Payment failure scenarios
+   - Network timeout handling
+   - Idempotency implementation
+   - Graceful degradation
+
+3. **Testing Suite**
+   - Payment flow testing
+   - Subscription lifecycle testing
+   - Webhook testing
+   - Security testing
+
+**Deliverables**:
+- [ ] Payment security verified
+- [ ] Error handling robust
+- [ ] Testing suite complete
+- [ ] PCI compliance confirmed
+
+## Phase 5: Photo Gallery System (Week 5-6)
+
+### Day 29-31: File Upload & Storage
+**Goal**: Secure photo storage system
+
+**Tasks**:
+1. **AWS S3 Integration**
+   - Bucket configuration
+   - IAM permissions setup
+   - CloudFront CDN configuration
+   - Presigned URL generation
+
+2. **Upload Interface**
+   - Admin photo upload tool
+   - Drag-and-drop interface
+   - Progress tracking
+   - Batch upload handling
+
+3. **Image Processing**
+   - Thumbnail generation
+   - Watermark application
+   - Format optimization
+   - Size compression
+
+**Deliverables**:
+- [ ] S3 storage functional
+- [ ] Upload interface working
+- [ ] Image processing active
+- [ ] CDN delivery optimized
+
+### Day 32-34: Gallery Management
+**Goal**: Photo gallery creation and management
+
+**Tasks**:
+1. **Gallery Creation**
+   - Session-based gallery creation
+   - Access control setup
+   - Privacy settings
+   - Expiration handling
+
+2. **Photo Organization**
+   - Photo categorization
+   - Sorting and filtering
+   - Metadata management
+   - Quality control workflow
+
+3. **Gallery Administration**
+   - Bulk photo operations
+   - Gallery settings management
+   - Access code generation
+   - Usage analytics
+
+**Deliverables**:
+- [ ] Gallery creation working
+- [ ] Photo organization complete
+- [ ] Admin tools functional
+- [ ] Access control secure
+
+### Day 35-37: Customer Gallery Experience
+**Goal**: Intuitive photo viewing and selection
+
+**Tasks**:
+1. **Gallery Viewing**
+   - Responsive photo grid
+   - Lightbox functionality
+   - Zoom and pan capabilities
+   - Mobile touch gestures
+
+2. **Photo Selection**
+   - Favorites system
+   - Batch selection tools
+   - Selection persistence
+   - Download preparation
+
+3. **Social Features**
+   - Social sharing options
+   - Private link generation
+   - Commenting system (optional)
+   - Download tracking
+
+**Deliverables**:
+- [ ] Gallery viewing optimized
+- [ ] Photo selection working
+- [ ] Social features basic
+- [ ] Mobile experience excellent
+
+### Day 38-42: Gallery Security & Performance
+**Goal**: Secure and fast photo delivery
+
+**Tasks**:
+1. **Access Control**
+   - Gallery password protection
+   - Time-based access links
+   - User permission management
+   - Audit logging
+
+2. **Performance Optimization**
+   - Lazy loading implementation
+   - Image format optimization
+   - Caching strategies
+   - CDN optimization
+
+3. **Download Management**
+   - Secure download links
+   - Download limitations
+   - Watermark options
+   - Usage tracking
+
+**Deliverables**:
+- [ ] Access control secure
+- [ ] Performance optimized
+- [ ] Download management complete
+- [ ] Security audit passed
+
+## Phase 6: E-commerce & Print-on-Demand (Week 7-8)
+
+### Day 43-45: Product Catalog
+**Goal**: Complete product management system
+
+**Tasks**:
+1. **Product Setup**
+   - Product catalog structure
+   - Variant management (sizes, materials)
+   - Pricing calculations
+   - Product image management
+
+2. **POD Integration**
+   - Printful API integration
+   - Gooten API setup
+   - Product synchronization
+   - Inventory management
+
+3. **Product Display**
+   - Product grid interface
+   - Product detail pages
+   - Customization options
+   - Price calculations
+
+**Deliverables**:
+- [ ] Product catalog complete
+- [ ] POD integration working
+- [ ] Product display functional
+- [ ] Customization options active
+
+### Day 46-48: Shopping Cart & Checkout
+**Goal**: Seamless shopping experience
+
+**Tasks**:
+1. **Shopping Cart**
+   - Add to cart functionality
+   - Cart persistence
+   - Quantity management
+   - Price calculations
+
+2. **Checkout Process**
+   - Multi-step checkout flow
+   - Address management
+   - Shipping calculations
+   - Order summary
+
+3. **Order Processing**
+   - Order creation workflow
+   - Payment processing integration
+   - Order confirmation
+   - Email notifications
+
+**Deliverables**:
+- [ ] Shopping cart functional
+- [ ] Checkout process complete
+- [ ] Order processing working
+- [ ] Notifications sending
+
+### Day 49-51: Order Fulfillment
+**Goal**: Automated order fulfillment
+
+**Tasks**:
+1. **POD Order Submission**
+   - Automatic order routing
+   - Multiple vendor support
+   - Order status tracking
+   - Error handling
+
+2. **Fulfillment Tracking**
+   - Shipping notifications
+   - Tracking number integration
+   - Delivery confirmations
+   - Customer updates
+
+3. **Order Management**
+   - Admin order dashboard
+   - Order status updates
+   - Customer service tools
+   - Returns processing
+
+**Deliverables**:
+- [ ] POD fulfillment automated
+- [ ] Tracking system complete
+- [ ] Order management functional
+- [ ] Customer service tools ready
+
+### Day 52-56: E-commerce Administration
+**Goal**: Complete e-commerce management
+
+**Tasks**:
+1. **Admin Dashboard**
+   - Order monitoring
+   - Product management
+   - Inventory tracking
+   - Revenue reporting
+
+2. **Customer Service**
+   - Order modification tools
+   - Refund processing
+   - Customer communication
+   - Issue resolution tracking
+
+3. **Analytics & Reporting**
+   - Sales analytics
+   - Product performance
+   - Customer behavior
+   - Profitability analysis
+
+**Deliverables**:
+- [ ] Admin dashboard complete
+- [ ] Customer service tools functional
+- [ ] Analytics system working
+- [ ] Reporting automated
+
+## Phase 7: Admin Dashboard & Operations (Week 9)
+
+### Day 57-59: Session Management Dashboard
+**Goal**: Efficient session operations
+
+**Tasks**:
+1. **Session Overview**
+   - Daily/weekly schedule view
+   - Session status tracking
+   - Customer information display
+   - Quick action buttons
+
+2. **Session Workflow**
+   - Check-in process
+   - Photo upload integration
+   - Session notes management
+   - Status update system
+
+3. **Customer Management**
+   - Customer profiles
+   - Session history
+   - Communication logs
+   - Special requirements tracking
+
+**Deliverables**:
+- [ ] Session dashboard functional
+- [ ] Workflow tools complete
+- [ ] Customer management working
+- [ ] Communication system basic
+
+### Day 60-61: Photo Management System
+**Goal**: Efficient photo processing workflow
+
+**Tasks**:
+1. **Photo Processing**
+   - Batch upload interface
+   - Editing status tracking
+   - Quality control workflow
+   - Approval process
+
+2. **Gallery Management**
+   - Gallery creation automation
+   - Access control management
+   - Usage monitoring
+   - Maintenance tools
+
+3. **Photo Analytics**
+   - Popular photo tracking
+   - Download statistics
+   - Customer preferences
+   - Revenue per photo
+
+**Deliverables**:
+- [ ] Photo processing efficient
+- [ ] Gallery management automated
+- [ ] Analytics tracking active
+- [ ] Workflow optimized
+
+### Day 62-63: Business Analytics
+**Goal**: Comprehensive business intelligence
+
+**Tasks**:
+1. **Revenue Analytics**
+   - Session revenue tracking
+   - Product sales analysis
+   - Payment plan performance
+   - Profit margin calculations
+
+2. **Customer Analytics**
+   - Customer lifetime value
+   - Booking patterns
+   - Retention analysis
+   - Referral tracking
+
+3. **Operational Analytics**
+   - Session efficiency metrics
+   - Photo processing times
+   - Customer satisfaction scores
+   - Staff productivity
+
+**Deliverables**:
+- [ ] Revenue analytics complete
+- [ ] Customer analytics working
+- [ ] Operational metrics tracked
+- [ ] Business intelligence actionable
+
+## Phase 8: Testing & Quality Assurance (Week 10)
+
+### Day 64-66: Comprehensive Testing
+**Goal**: Bug-free, reliable system
+
+**Tasks**:
+1. **Unit Testing**
+   - Component testing
+   - Utility function testing
+   - API endpoint testing
+   - Database operation testing
+
+2. **Integration Testing**
+   - Payment flow testing
+   - POD integration testing
+   - Email delivery testing
+   - File upload testing
+
+3. **End-to-End Testing**
+   - Complete user journeys
+   - Admin workflow testing
+   - Error scenario testing
+   - Performance testing
+
+**Deliverables**:
+- [ ] Unit test coverage >80%
+- [ ] Integration tests passing
+- [ ] E2E tests comprehensive
+- [ ] Performance benchmarks met
+
+### Day 67-68: Security & Performance Audit
+**Goal**: Production-ready security and performance
+
+**Tasks**:
+1. **Security Audit**
+   - Vulnerability scanning
+   - Authentication testing
+   - Data privacy compliance
+   - Input validation verification
+
+2. **Performance Optimization**
+   - Page speed optimization
+   - Database query optimization
+   - Image delivery optimization
+   - Mobile performance tuning
+
+3. **Accessibility Compliance**
+   - WCAG guidelines compliance
+   - Screen reader testing
+   - Keyboard navigation testing
+   - Color contrast verification
+
+**Deliverables**:
+- [ ] Security audit passed
+- [ ] Performance optimized
+- [ ] Accessibility compliant
+- [ ] Production readiness verified
+
+### Day 69-70: User Acceptance Testing
+**Goal**: Real-world usability validation
+
+**Tasks**:
+1. **Stakeholder Testing**
+   - Business owner testing
+   - Staff workflow testing
+   - Customer journey testing
+   - Mobile usability testing
+
+2. **Bug Fixes & Refinements**
+   - Critical bug resolution
+   - UX improvement implementation
+   - Performance fine-tuning
+   - Final polish and cleanup
+
+3. **Documentation Updates**
+   - User manual creation
+   - Admin guide completion
+   - Technical documentation
+   - Troubleshooting guides
+
+**Deliverables**:
+- [ ] UAT completed successfully
+- [ ] Critical bugs resolved
+- [ ] Documentation complete
+- [ ] System ready for launch
+
+## Phase 9: Deployment & Launch Preparation (Week 11)
+
+### Day 71-73: Production Deployment
+**Goal**: Live, stable production environment
+
+**Tasks**:
+1. **Infrastructure Setup**
+   - Production database deployment
+   - CDN configuration
+   - SSL certificate installation
+   - Domain configuration
+
+2. **Environment Configuration**
+   - Production environment variables
+   - Stripe live mode configuration
+   - AWS production permissions
+   - Email service configuration
+
+3. **Deployment Pipeline**
+   - CI/CD pipeline setup
+   - Automated testing integration
+   - Deployment monitoring
+   - Rollback procedures
+
+**Deliverables**:
+- [ ] Production environment live
+- [ ] All integrations working
+- [ ] Monitoring systems active
+- [ ] Deployment pipeline functional
+
+### Day 74-75: Data Migration & Final Testing
+**Goal**: Production data ready and validated
+
+**Tasks**:
+1. **Data Migration**
+   - Package data import
+   - Product catalog import
+   - User account migration (if applicable)
+   - Initial content setup
+
+2. **Production Testing**
+   - Live payment testing
+   - Email delivery verification
+   - POD integration testing
+   - Performance validation
+
+3. **Launch Preparation**
+   - Staff training completion
+   - Customer communication preparation
+   - Marketing material finalization
+   - Support documentation ready
+
+**Deliverables**:
+- [ ] Data migration complete
+- [ ] Production testing passed
+- [ ] Staff training completed
+- [ ] Launch materials ready
+
+### Day 76-77: Soft Launch & Monitoring
+**Goal**: Controlled launch with monitoring
+
+**Tasks**:
+1. **Soft Launch**
+   - Limited customer access
+   - Staff workflow validation
+   - Real transaction testing
+   - Customer feedback collection
+
+2. **Monitoring & Optimization**
+   - Error monitoring setup
+   - Performance monitoring
+   - User behavior tracking
+   - Issue resolution workflow
+
+3. **Launch Refinements**
+   - Bug fixes from soft launch
+   - Performance optimizations
+   - UX improvements
+   - System hardening
+
+**Deliverables**:
+- [ ] Soft launch successful
+- [ ] Monitoring systems operational
+- [ ] Initial issues resolved
+- [ ] System optimized for full launch
+
+## Phase 10: Full Launch & Post-Launch (Week 12)
+
+### Day 78-80: Full Launch
+**Goal**: Public launch with full marketing
+
+**Tasks**:
+1. **Go-Live Activities**
+   - Public website launch
+   - Marketing campaign activation
+   - Social media announcement
+   - Press release distribution
+
+2. **Launch Support**
+   - Extended monitoring
+   - Rapid issue response
+   - Customer support readiness
+   - Staff availability increase
+
+3. **Performance Tracking**
+   - Launch metrics monitoring
+   - Conversion rate tracking
+   - System performance monitoring
+   - Customer satisfaction tracking
+
+**Deliverables**:
+- [ ] Public launch executed
+- [ ] Marketing campaigns active
+- [ ] Support systems operational
+- [ ] Metrics tracking comprehensive
+
+### Day 81-84: Post-Launch Optimization
+**Goal**: Continuous improvement based on real usage
+
+**Tasks**:
+1. **User Feedback Integration**
+   - Customer feedback analysis
+   - Usage pattern analysis
+   - Pain point identification
+   - Improvement prioritization
+
+2. **Performance Optimization**
+   - Real-world performance tuning
+   - Database optimization
+   - User experience refinements
+   - Mobile experience improvements
+
+3. **Feature Enhancements**
+   - Quick wins implementation
+   - User-requested features
+   - Workflow optimizations
+   - System reliability improvements
+
+**Deliverables**:
+- [ ] User feedback incorporated
+- [ ] Performance optimized
+- [ ] Quick wins deployed
+- [ ] Continuous improvement process established
+
+## Success Metrics & KPIs
+
+### Technical Metrics
+- **Page Load Speed**: <3 seconds on mobile
+- **Uptime**: 99.9% availability
+- **Test Coverage**: >80% code coverage
+- **Security Score**: A+ rating on security audits
+
+### Business Metrics
+- **Booking Conversion**: >15% from landing page
+- **Payment Plan Adoption**: >60% of bookings
+- **Customer Satisfaction**: >4.5/5 rating
+- **Average Order Value**: $150+ per session
+
+### Operational Metrics
+- **Session Processing Time**: <2 hours from upload to gallery
+- **Order Fulfillment**: <24 hours to POD submission
+- **Customer Support Response**: <2 hours during business hours
+- **Staff Efficiency**: 50% reduction in manual tasks
+
+## Risk Mitigation Strategies
+
+### Technical Risks
+- **Payment Processing Failures**: Backup payment processors
+- **POD Service Downtime**: Multiple vendor integration
+- **Database Performance**: Read replicas and caching
+- **Image Storage Issues**: Multi-region backup
+
+### Business Risks
+- **Low Conversion Rates**: A/B testing and optimization
+- **High Customer Acquisition Cost**: Referral programs
+- **Seasonal Demand**: Flexible pricing strategies
+- **Competition**: Unique value proposition emphasis
+
+### Operational Risks
+- **Staff Training**: Comprehensive documentation
+- **System Complexity**: Simplified admin interfaces
+- **Customer Support**: Self-service options
+- **Quality Control**: Automated workflow checks
+/docs/CRITICAL_CONSIDERATIONS.md
+markdown# Electric Muse - Critical Implementation Considerations
+
+## Security Imperatives
+
+### Child Safety & Privacy (HIGHEST PRIORITY)
+**Critical Requirements**:
+- Photo access must be locked down with multiple security layers
+- Gallery passwords should be strong and unique
+- No public indexing of galleries or photos
+- Parental consent required for all photo usage
+- COPPA compliance for children under 13
+- Right to deletion must be absolute and immediate
+
+**Implementation Details**:
+- Gallery access codes: 12+ character alphanumeric
+- Time-limited gallery access (30-90 days default)
+- IP address logging for all photo access
+- Watermarks on all preview images
+- Full-resolution images only via authenticated download
+- Photo metadata scrubbing before delivery
+
+### Payment Security (CRITICAL)
+**PCI Compliance Requirements**:
+- Never store payment card data locally
+- All payment forms must use Stripe Elements
+- Webhook payload verification mandatory
+- Payment retry logic with exponential backoff
+- Fraud detection integration
+- Secure customer payment method storage
+
+**Implementation Details**:
+```typescript
+// Example webhook verification
+const sig = request.headers['stripe-signature']
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET
+const event = stripe.webhooks.constructEvent(body, sig, endpointSecret)
+Data Protection
+Privacy Requirements:
+
+GDPR compliance for data handling
+User data encryption at rest
+Secure session management
+Right to data portability
+Right to be forgotten implementation
+Data breach notification procedures
+
+Performance Considerations
+Image Delivery Optimization
+Critical Performance Factors:
+
+Large photo files (10-50MB originals)
+Multiple image formats and sizes needed
+Mobile network considerations
+Gallery loading with 50+ photos
+Simultaneous user access during peak times
+
+Optimization Strategy:
+typescript// Image optimization pipeline
+1. Original upload → S3 raw storage
+2. Background processing → Multiple formats/sizes
+3. CDN distribution → Global edge caching
+4. Progressive loading → Thumbnail → Full resolution
+5. Lazy loading → Only visible images loaded
+Database Performance
+Query Optimization Priorities:
+
+Session availability checking (high frequency)
+Photo gallery loading (large datasets)
+Order processing (transactional integrity)
+Payment plan processing (scheduled operations)
+Analytics queries (complex aggregations)
+
+Indexing Strategy:
+sql-- Critical indexes for performance
+CREATE INDEX CONCURRENTLY idx_sessions_availability 
+ON sessions(session_date, session_time) 
+WHERE status IN ('available', 'booked');
+
+CREATE INDEX CONCURRENTLY idx_photos_gallery_order 
+ON photos(gallery_id, sort_order) 
+WHERE deleted_at IS NULL;
+Scalability Planning
+Growth Projections:
+
+50 sessions per month initially
+500+ photos per session
+100+ products per order potential
+10,000+ photos stored monthly
+Peak traffic during holidays
+
+Business Logic Complexities
+Payment Plan Edge Cases
+Complex Scenarios to Handle:
+
+Failed payments with grace periods
+Plan modifications mid-cycle
+Refunds with partial payments made
+Currency conversion for international customers
+Tax calculation changes mid-plan
+Business closure during payment plan
+
+Implementation Considerations:
+typescript// Payment plan state machine
+enum PaymentPlanStatus {
+  ACTIVE = 'active',
+  PAST_DUE = 'past_due',
+  CANCELLED = 'cancelled',
+  COMPLETED = 'completed',
+  PAUSED = 'paused'
+}
+
+// Grace period handling
+const GRACE_PERIOD_DAYS = 7
+const MAX_RETRY_ATTEMPTS = 3
+Session Scheduling Complexity
+Business Rules to Implement:
+
+No double-booking prevention
+Buffer time between sessions (30+ minutes)
+Staff availability considerations
+Holiday and vacation scheduling
+Emergency rescheduling procedures
+Weather-related cancellations
+
+Photo Release & Usage Rights
+Legal Considerations:
+
+Model releases for each child
+Usage rights for marketing materials
+Social media sharing permissions
+Commercial use restrictions
+Photo editing consent
+Third-party printing rights
+
+Print-on-Demand Integration Challenges
+Multi-Vendor Management
+Complexity Factors:
+
+Different API structures (Printful vs Gooten)
+Varying product catalogs and pricing
+Different shipping options and costs
+Quality differences between vendors
+Fulfillment time variations
+Return/refund policy differences
+
+Vendor Failover Strategy:
+typescript// Vendor selection logic
+const vendorPriority = [
+  { name: 'printful', maxItems: 10, avgFulfillment: 3 },
+  { name: 'gooten', maxItems: 5, avgFulfillment: 5 }
+]
+
+async function routeOrder(orderItems) {
+  for (const vendor of vendorPriority) {
+    if (await vendor.checkAvailability(orderItems)) {
+      return vendor.submitOrder(orderItems)
+    }
+  }RetryBTContinueEditthrow new Error('No vendors available for order fulfillment')
+}
+
+### Product Synchronization
+**Ongoing Challenges**:
+- Product availability changes
+- Price fluctuations
+- New product additions
+- Discontinued items
+- Size/material variations
+- Quality standards maintenance
+
+## Mobile Experience Priorities
+
+### Mobile-First Considerations
+**Critical Mobile UX Factors**:
+- Parents browse primarily on phones
+- Photo viewing requires pinch-to-zoom
+- Large image files on cellular networks
+- Touch-friendly interface elements
+- Simplified navigation structures
+- One-handed operation capability
+
+**Performance Targets**:
+- Initial page load: <3 seconds on 3G
+- Gallery loading: Progressive with placeholders
+- Image zoom: Smooth 60fps interactions
+- Form completion: Single-page flows
+- Payment process: <2 minutes total
+
+### Responsive Design Strategy
+```css
+/* Mobile-first breakpoints */
+@screen sm { /* 640px+ */ }
+@screen md { /* 768px+ */ }
+@screen lg { /* 1024px+ */ }
+@screen xl { /* 1280px+ */ }
+
+/* Critical mobile optimizations */
+.gallery-grid {
+  @apply grid grid-cols-2 gap-2;
+  @screen md: grid-cols-3 gap-4;
+  @screen lg: grid-cols-4 gap-6;
+}
+Email & Communication Strategy
+Automated Email Sequences
+Critical Communication Points:
+
+Booking Confirmation (immediate)
+Session Reminder (24 hours before)
+Preparation Instructions (48 hours before)
+Gallery Ready (3-5 days after session)
+Payment Reminders (for payment plans)
+Order Confirmations (immediate)
+Shipping Notifications (when dispatched)
+
+Email Template Requirements:
+
+Mobile-responsive design
+Brand consistency with rock/punk theme
+Clear call-to-action buttons
+Personalization with child names
+Unsubscribe compliance
+Tracking and analytics
+
+SMS Integration Strategy
+High-Priority SMS Notifications:
+
+Session day reminders
+Gallery access codes
+Payment failure alerts
+Order shipping updates
+
+Error Handling & Recovery
+Critical Error Scenarios
+Payment Processing Failures:
+typescript// Robust payment error handling
+try {
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: calculateAmount(orderTotal),
+    currency: 'usd',
+    payment_method: paymentMethodId,
+    confirmation_method: 'manual',
+    confirm: true,
+  })
+} catch (error) {
+  if (error.code === 'card_declined') {
+    // Specific handling for declined cards
+    await notifyCustomer('payment_declined', { reason: error.decline_code })
+  } else if (error.code === 'authentication_required') {
+    // 3D Secure authentication needed
+    return { requiresAuthentication: true, clientSecret: error.payment_intent.client_secret }
+  } else {
+    // Log error and provide fallback
+    await logPaymentError(error, { userId, sessionId, amount })
+    throw new PaymentProcessingError('Payment failed. Please try again.')
+  }
+}
+File Upload Failures:
+typescript// Resilient file upload with retry logic
+const uploadWithRetry = async (file, retries = 3) => {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return await uploadToS3(file)
+    } catch (error) {
+      if (attempt === retries) throw error
+      
+      const backoffDelay = Math.pow(2, attempt) * 1000
+      await new Promise(resolve => setTimeout(resolve, backoffDelay))
+    }
+  }
+}
+Data Backup & Recovery
+Backup Strategy:
+
+Database: Automated daily backups with point-in-time recovery
+Photos: Multi-region S3 replication
+Configuration: Infrastructure as Code (Terraform)
+Secrets: Encrypted vault storage
+Recovery Time Objective (RTO): 4 hours
+Recovery Point Objective (RPO): 1 hour
+
+Legal & Compliance Requirements
+Photography Business Compliance
+Required Legal Documents:
+
+Model release forms for children
+Terms of service with usage rights
+Privacy policy (COPPA compliant)
+Photo licensing agreements
+Copyright protection notices
+Liability waivers for sessions
+
+Business Operation Compliance
+Tax and Financial Requirements:
+
+Sales tax calculation by location
+International tax compliance (if applicable)
+Revenue recognition for payment plans
+Refund and chargeback handling
+Financial reporting requirements
+Audit trail maintenance
+
+Data Privacy Regulations
+Compliance Frameworks:
+
+COPPA (Children's Online Privacy Protection Act)
+GDPR (if serving EU customers)
+CCPA (California Consumer Privacy Act)
+State privacy laws (Virginia, Colorado, etc.)
+Photography-specific privacy laws
+
+Quality Assurance Protocols
+Photo Quality Standards
+Technical Requirements:
+
+Minimum resolution: 300 DPI for prints
+Color profile: sRGB for web, Adobe RGB for print
+File formats: RAW for editing, JPEG for delivery
+Watermark specifications: 50% opacity, corner placement
+Compression: Lossless for originals, optimized for web
+
+Quality Control Workflow:
+
+Raw photo upload and cataloging
+Automatic technical validation
+Manual quality review
+Basic editing and color correction
+Client approval process
+Final delivery preparation
+
+Testing Protocols
+Critical Test Scenarios:
+typescript// E2E test coverage requirements
+describe('Complete Customer Journey', () => {
+  test('Book session with payment plan', async () => {
+    // Test complete booking flow
+  })
+  
+  test('Access gallery and order products', async () => {
+    // Test gallery access and shopping
+  })
+  
+  test('Handle payment failures gracefully', async () => {
+    // Test error scenarios
+  })
+  
+  test('Admin workflow from upload to delivery', async () => {
+    // Test admin operations
+  })
+})
+Performance Monitoring & Analytics
+Key Performance Indicators (KPIs)
+Technical Metrics:
+
+Page load speed: <3s first contentful paint
+Image loading: Progressive enhancement
+Database query time: <100ms average
+API response time: <500ms 95th percentile
+Uptime: 99.9% availability
+
+Business Metrics:
+
+Conversion rate: Landing page to booking
+Cart abandonment: Gallery to purchase
+Customer lifetime value
+Average order value
+Payment plan completion rate
+
+Monitoring Stack
+Error Tracking:
+typescript// Sentry integration for error monitoring
+import * as Sentry from '@sentry/nextjs'
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  environment: process.env.NODE_ENV,
+  beforeSend(event, hint) {
+    // Filter sensitive data
+    if (event.request?.headers?.authorization) {
+      delete event.request.headers.authorization
+    }
+    return event
+  }
+})
+Performance Monitoring:
+
+Core Web Vitals tracking
+Real User Monitoring (RUM)
+Server-side performance metrics
+Database query analysis
+Third-party service monitoring
+
+Maintenance & Support Considerations
+Ongoing Maintenance Requirements
+Regular Tasks:
+
+Database optimization and indexing
+Image storage cleanup and archiving
+Security patch management
+Dependency updates
+Performance monitoring review
+Backup verification testing
+
+Quarterly Reviews:
+
+Security audit and penetration testing
+Performance optimization review
+User experience analysis
+Business logic updates
+Compliance verification
+
+Support Infrastructure
+Customer Support Tools:
+
+Help desk integration
+Live chat capability
+Knowledge base and FAQ
+Video tutorials for common tasks
+Remote assistance for technical issues
+
+Technical Support:
+
+Error logging and alerting
+System health monitoring
+Automated incident response
+Escalation procedures
+Documentation maintenance
+
+Scalability & Growth Planning
+Horizontal Scaling Considerations
+Database Scaling:
+
+Read replicas for analytics queries
+Connection pooling optimization
+Query caching strategies
+Potential sharding for photos table
+
+Application Scaling:
+
+Stateless application design
+CDN for static assets
+Load balancing strategies
+Microservices extraction (POD, payments)
+
+Feature Expansion Roadmap
+Phase 2 Features:
+
+Multi-location support
+Staff scheduling system
+Customer referral program
+Advanced photo editing tools
+Mobile app development
+
+Phase 3 Features:
+
+Franchise model support
+Advanced analytics dashboard
+AI-powered photo selection
+Video session options
+Subscription service model
+
+Integration Testing Strategy
+Third-Party Service Testing
+Stripe Integration Tests:
+typescript// Mock Stripe for testing
+jest.mock('stripe', () => ({
+  paymentIntents: {
+    create: jest.fn(),
+    confirm: jest.fn(),
+    retrieve: jest.fn()
+  },
+  webhooks: {
+    constructEvent: jest.fn()
+  }
+}))
+
+// Test payment plan creation
+test('creates payment plan successfully', async () => {
+  const mockSubscription = { id: 'sub_test123', status: 'active' }
+  stripe.subscriptions.create.mockResolvedValue(mockSubscription)
+  
+  const result = await createPaymentPlan({
+    sessionId: 'session_123',
+    planType: '3_pay',
+    totalAmount: 399.00
+  })
+  
+  expect(result.stripeSubscriptionId).toBe('sub_test123')
+})
+Print-on-Demand Testing:
+
+Product catalog synchronization tests
+Order submission workflow tests
+Webhook handling verification
+Fallback vendor testing
+Quality assurance integration
+
+Load Testing Requirements
+Performance Benchmarks:
+
+100 concurrent users browsing galleries
+50 simultaneous photo uploads
+25 concurrent checkout processes
+Peak holiday traffic simulation
+Database performance under load
+
+Documentation Requirements
+Technical Documentation
+Developer Guides:
+
+API documentation with examples
+Database schema and relationships
+Deployment procedures
+Environment setup guides
+Troubleshooting workflows
+
+User Documentation
+Admin User Guides:
+
+Session management workflow
+Photo upload and processing
+Order fulfillment procedures
+Customer service protocols
+System maintenance tasks
+
+Customer Guides:
+
+Booking process explanation
+Gallery access instructions
+Product ordering tutorials
+Payment plan management
+Troubleshooting common issues
+
