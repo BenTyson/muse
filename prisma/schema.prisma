@@ -1,0 +1,588 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Users & Authentication
+model User {
+  id               String    @id @default(uuid())
+  email            String    @unique
+  passwordHash     String?   @map("password_hash")
+  firstName        String    @map("first_name")
+  lastName         String    @map("last_name")
+  phone            String?
+  emailVerified    Boolean   @default(false) @map("email_verified")
+  marketingConsent Boolean   @default(false) @map("marketing_consent")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  deletedAt        DateTime? @map("deleted_at")
+
+  // Relations
+  children      Child[]
+  sessions      Session[]
+  orders        Order[]
+  paymentMethods CustomerPaymentMethod[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
+  editedPhotos  PhotoEdit[] @relation("PhotoEditor")
+  approvedPhotos PhotoEdit[] @relation("PhotoApprover")
+  photoSelections PhotoSelection[]
+  statusChanges SessionStatusHistory[]
+  families      Family[] @relation("FamilyPrimaryParent")
+  settingUpdates Setting[] @relation("SettingUpdater")
+
+  @@map("users")
+}
+
+// Children profiles
+model Child {
+  id                 String    @id @default(uuid())
+  parentId           String    @map("parent_id")
+  firstName          String    @map("first_name")
+  lastName           String    @map("last_name")
+  birthDate          DateTime? @map("birth_date")
+  preferredStyle     String?   @map("preferred_style") // rock, punk, metal, alternative
+  musicPreferences   String?   @map("music_preferences")
+  styleNotes         String?   @map("style_notes")
+  specialRequirements String?  @map("special_requirements")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  deletedAt          DateTime? @map("deleted_at")
+
+  // Relations
+  parent User @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  sessionChildren SessionChild[]
+  families FamilyChild[]
+
+  @@map("children")
+}
+
+// Photography packages
+model Package {
+  id                String   @id @default(uuid())
+  name              String
+  slug              String   @unique
+  description       String?
+  shortDescription  String?  @map("short_description")
+  basePrice         Decimal  @map("base_price") @db.Decimal(10, 2)
+  durationMinutes   Int      @map("duration_minutes")
+  maxChildren       Int      @default(1) @map("max_children")
+  includesStyling   Boolean  @default(true) @map("includes_styling")
+  maxOutfitChanges  Int      @default(1) @map("max_outfit_changes")
+  includedPhotos    Int      @default(5) @map("included_photos")
+  photoEditingLevel String?  @map("photo_editing_level") // basic, standard, premium
+  includesPrint     Boolean  @default(true) @map("includes_print")
+  printSize         String?  @map("print_size") // 4x6, 5x7, 8x10
+  active            Boolean  @default(true)
+  sortOrder         Int      @default(0) @map("sort_order")
+  metadata          Json?
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  sessions    Session[]
+  addons      PackageAddon[]
+  pricing     PackagePricing[]
+
+  @@map("packages")
+}
+
+// Package add-ons
+model PackageAddon {
+  id          String   @id @default(uuid())
+  packageId   String   @map("package_id")
+  name        String
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  addonType   String   @map("addon_type") // extra_time, additional_child, premium_editing
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0) @map("sort_order")
+
+  // Relations
+  package Package @relation(fields: [packageId], references: [id])
+  sessionAddons SessionAddon[]
+
+  @@map("package_addons")
+}
+
+// Seasonal pricing and promotions
+model PackagePricing {
+  id           String    @id @default(uuid())
+  packageId    String    @map("package_id")
+  priceType    String    @map("price_type") // regular, holiday, promotion
+  priceModifier Decimal  @map("price_modifier") @db.Decimal(10, 2)
+  modifierType String    @map("modifier_type") // fixed, percentage
+  validFrom    DateTime  @map("valid_from")
+  validUntil   DateTime  @map("valid_until")
+  promoCode    String?   @map("promo_code")
+  maxUses      Int?      @map("max_uses")
+  currentUses  Int       @default(0) @map("current_uses")
+  active       Boolean   @default(true)
+
+  // Relations
+  package Package @relation(fields: [packageId], references: [id])
+
+  @@map("package_pricing")
+}
+
+// Photography sessions
+model Session {
+  id                String    @id @default(uuid())
+  userId            String    @map("user_id")
+  packageId         String    @map("package_id")
+  sessionNumber     String    @unique @map("session_number")
+  sessionDate       DateTime  @map("session_date")
+  sessionTime       DateTime  @map("session_time")
+  estimatedDuration Int?      @map("estimated_duration")
+  status            String    @default("booked") // booked, confirmed, in_progress, completed, cancelled
+  totalAmount       Decimal   @map("total_amount") @db.Decimal(10, 2)
+  depositAmount     Decimal   @map("deposit_amount") @db.Decimal(10, 2)
+  balanceDue        Decimal   @map("balance_due") @db.Decimal(10, 2)
+  specialRequests   String?   @map("special_requests")
+  preparationNotes  String?   @map("preparation_notes")
+  stylingNotes      String?   @map("styling_notes")
+  photographerNotes String?   @map("photographer_notes")
+  completionNotes   String?   @map("completion_notes")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  cancelledAt       DateTime? @map("cancelled_at")
+  cancellationReason String?  @map("cancellation_reason")
+
+  // Relations
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  package  Package  @relation(fields: [packageId], references: [id])
+  sessionChildren SessionChild[]
+  sessionAddons   SessionAddon[]
+  statusHistory   SessionStatusHistory[]
+  paymentPlans    PaymentPlan[]
+  payments        Payment[]
+  gallery         Gallery?
+  orders          Order[]
+
+  @@map("sessions")
+}
+
+// Children attending each session
+model SessionChild {
+  sessionId        String  @map("session_id")
+  childId          String  @map("child_id")
+  primaryChild     Boolean @default(false) @map("primary_child")
+  stylingRequests  String? @map("styling_requests")
+  completedStyling Boolean @default(false) @map("completed_styling")
+
+  // Relations
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  child   Child   @relation(fields: [childId], references: [id])
+
+  @@id([sessionId, childId])
+  @@map("session_children")
+}
+
+// Session add-ons purchased
+model SessionAddon {
+  id         String  @id @default(uuid())
+  sessionId  String  @map("session_id")
+  addonId    String  @map("addon_id")
+  quantity   Int     @default(1)
+  unitPrice  Decimal @map("unit_price") @db.Decimal(10, 2)
+  totalPrice Decimal @map("total_price") @db.Decimal(10, 2)
+
+  // Relations
+  session Session      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  addon   PackageAddon @relation(fields: [addonId], references: [id])
+
+  @@map("session_addons")
+}
+
+// Session status history
+model SessionStatusHistory {
+  id        String   @id @default(uuid())
+  sessionId String   @map("session_id")
+  oldStatus String?  @map("old_status")
+  newStatus String   @map("new_status")
+  reason    String?
+  changedBy String?  @map("changed_by")
+  changedAt DateTime @default(now()) @map("changed_at")
+
+  // Relations
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  changedByUser User? @relation(fields: [changedBy], references: [id])
+
+  @@map("session_status_history")
+}
+
+// Payment plans for sessions
+model PaymentPlan {
+  id                   String    @id @default(uuid())
+  sessionId            String    @map("session_id")
+  stripeSubscriptionId String?   @map("stripe_subscription_id")
+  stripeCustomerId     String?   @map("stripe_customer_id")
+  planType             String    @map("plan_type") // full, 2_pay, 3_pay, 4_pay
+  totalAmount          Decimal   @map("total_amount") @db.Decimal(10, 2)
+  amountPerPayment     Decimal?  @map("amount_per_payment") @db.Decimal(10, 2)
+  paymentsTotal        Int?      @map("payments_total")
+  paymentsCompleted    Int       @default(0) @map("payments_completed")
+  paymentsRemaining    Int?      @map("payments_remaining")
+  nextPaymentDate      DateTime? @map("next_payment_date")
+  status               String    @default("active") // active, completed, failed, cancelled
+  failureCount         Int       @default(0) @map("failure_count")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  session  Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  payments Payment[]
+
+  @@map("payment_plans")
+}
+
+// Individual payment transactions
+model Payment {
+  id                    String    @id @default(uuid())
+  sessionId             String?   @map("session_id")
+  orderId               String?   @map("order_id")
+  paymentPlanId         String?   @map("payment_plan_id")
+  stripePaymentIntentId String?   @map("stripe_payment_intent_id")
+  stripeChargeId        String?   @map("stripe_charge_id")
+  amount                Decimal   @db.Decimal(10, 2)
+  paymentType           String    @map("payment_type") // deposit, balance, plan_payment, product_purchase
+  paymentMethod         String?   @map("payment_method") // card, bank_transfer
+  status                String    @default("pending") // pending, succeeded, failed, refunded
+  failureReason         String?   @map("failure_reason")
+  failureCode           String?   @map("failure_code")
+  refundAmount          Decimal   @default(0) @map("refund_amount") @db.Decimal(10, 2)
+  refundReason          String?   @map("refund_reason")
+  processedAt           DateTime? @map("processed_at")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  session     Session?     @relation(fields: [sessionId], references: [id])
+  order       Order?       @relation(fields: [orderId], references: [id])
+  paymentPlan PaymentPlan? @relation(fields: [paymentPlanId], references: [id])
+
+  @@map("payments")
+}
+
+// Customer payment methods
+model CustomerPaymentMethod {
+  id                     String   @id @default(uuid())
+  userId                 String   @map("user_id")
+  stripePaymentMethodId  String   @map("stripe_payment_method_id")
+  type                   String   // card, bank_account
+  lastFour               String?  @map("last_four")
+  brand                  String?  // visa, mastercard, amex
+  expMonth               Int?     @map("exp_month")
+  expYear                Int?     @map("exp_year")
+  isDefault              Boolean  @default(false) @map("is_default")
+  active                 Boolean  @default(true)
+  createdAt              DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("customer_payment_methods")
+}
+
+// Photo galleries
+model Gallery {
+  id                  String    @id @default(uuid())
+  sessionId           String    @unique @map("session_id")
+  name                String
+  slug                String    @unique
+  accessCode          String?   @unique @map("access_code")
+  passwordHash        String?   @map("password_hash")
+  publicShareEnabled  Boolean   @default(false) @map("public_share_enabled")
+  downloadEnabled     Boolean   @default(true) @map("download_enabled")
+  socialShareEnabled  Boolean   @default(true) @map("social_share_enabled")
+  watermarkEnabled    Boolean   @default(true) @map("watermark_enabled")
+  expiresAt           DateTime? @map("expires_at")
+  viewCount           Int       @default(0) @map("view_count")
+  downloadCount       Int       @default(0) @map("download_count")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  photos  Photo[]
+
+  @@map("galleries")
+}
+
+// Individual photos
+model Photo {
+  id               String    @id @default(uuid())
+  galleryId        String    @map("gallery_id")
+  filename         String
+  originalFilename String?   @map("original_filename")
+  altText          String?   @map("alt_text")
+  fileSize         BigInt?   @map("file_size")
+  width            Int?
+  height           Int?
+  mimeType         String?   @map("mime_type")
+  s3Key            String    @map("s3_key")
+  s3ThumbnailKey   String?   @map("s3_thumbnail_key")
+  s3WatermarkKey   String?   @map("s3_watermark_key")
+  editingStatus    String    @default("raw") @map("editing_status") // raw, editing, edited, approved
+  isComplimentary  Boolean   @default(false) @map("is_complimentary")
+  isFeatured       Boolean   @default(false) @map("is_featured")
+  sortOrder        Int       @default(0) @map("sort_order")
+  photographerNotes String?  @map("photographer_notes")
+  editingNotes     String?   @map("editing_notes")
+  metadata         Json?
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  deletedAt        DateTime? @map("deleted_at")
+
+  // Relations
+  gallery    Gallery          @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+  edits      PhotoEdit[]
+  selections PhotoSelection[]
+  orderItems OrderItem[]
+
+  @@map("photos")
+}
+
+// Photo editing workflow
+model PhotoEdit {
+  id              String    @id @default(uuid())
+  photoId         String    @map("photo_id")
+  editorId        String?   @map("editor_id")
+  editType        String    @map("edit_type") // color_correction, retouching, effects
+  editDescription String?   @map("edit_description")
+  beforeS3Key     String?   @map("before_s3_key")
+  afterS3Key      String?   @map("after_s3_key")
+  approved        Boolean?
+  approvedBy      String?   @map("approved_by")
+  approvedAt      DateTime? @map("approved_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  photo       Photo  @relation(fields: [photoId], references: [id], onDelete: Cascade)
+  editor      User?  @relation("PhotoEditor", fields: [editorId], references: [id])
+  approver    User?  @relation("PhotoApprover", fields: [approvedBy], references: [id])
+
+  @@map("photo_edits")
+}
+
+// Customer photo favorites and selections
+model PhotoSelection {
+  id            String   @id @default(uuid())
+  photoId       String   @map("photo_id")
+  userId        String   @map("user_id")
+  selectionType String   @map("selection_type") // favorite, cart, purchased
+  notes         String?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  // Relations
+  photo Photo @relation(fields: [photoId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([photoId, userId, selectionType])
+  @@map("photo_selections")
+}
+
+// Print products catalog
+model Product {
+  id                    String   @id @default(uuid())
+  name                  String
+  slug                  String   @unique
+  description           String?
+  shortDescription      String?  @map("short_description")
+  category              String   // prints, canvas, metal, apparel, accessories
+  subcategory           String?
+  basePrice             Decimal  @map("base_price") @db.Decimal(10, 2)
+  printfulProductId     String?  @map("printful_product_id")
+  gootenProductId       String?  @map("gooten_product_id")
+  productImage          String?  @map("product_image")
+  sizeOptions           Json?    @map("size_options")
+  materialOptions       Json?    @map("material_options")
+  colorOptions          Json?    @map("color_options")
+  customizationOptions  Json?    @map("customization_options")
+  active                Boolean  @default(true)
+  featured              Boolean  @default(false)
+  sortOrder             Int      @default(0) @map("sort_order")
+  metadata              Json?
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  variants ProductVariant[]
+
+  @@map("products")
+}
+
+// Product variants (size/material combinations)
+model ProductVariant {
+  id                String   @id @default(uuid())
+  productId         String   @map("product_id")
+  sku               String   @unique
+  name              String
+  size              String?
+  material          String?
+  color             String?
+  price             Decimal  @db.Decimal(10, 2)
+  printfulVariantId String?  @map("printful_variant_id")
+  gootenVariantId   String?  @map("gooten_variant_id")
+  active            Boolean  @default(true)
+  sortOrder         Int      @default(0) @map("sort_order")
+
+  // Relations
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+
+  @@map("product_variants")
+}
+
+// Customer orders
+model Order {
+  id                    String    @id @default(uuid())
+  userId                String    @map("user_id")
+  sessionId             String?   @map("session_id")
+  orderNumber           String    @unique @map("order_number")
+  status                String    @default("pending") // pending, processing, printed, shipped, delivered
+  subtotal              Decimal   @db.Decimal(10, 2)
+  taxAmount             Decimal   @default(0) @map("tax_amount") @db.Decimal(10, 2)
+  shippingAmount        Decimal   @default(0) @map("shipping_amount") @db.Decimal(10, 2)
+  discountAmount        Decimal   @default(0) @map("discount_amount") @db.Decimal(10, 2)
+  totalAmount           Decimal   @map("total_amount") @db.Decimal(10, 2)
+  currency              String    @default("USD")
+  shippingAddress       Json      @map("shipping_address")
+  billingAddress        Json?     @map("billing_address")
+  stripePaymentIntentId String?   @map("stripe_payment_intent_id")
+  trackingNumbers       Json?     @map("tracking_numbers")
+  estimatedDelivery     DateTime? @map("estimated_delivery")
+  deliveredAt           DateTime? @map("delivered_at")
+  notes                 String?
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session  Session?    @relation(fields: [sessionId], references: [id])
+  items    OrderItem[]
+  payments Payment[]
+
+  @@map("orders")
+}
+
+// Order items
+model OrderItem {
+  id                 String   @id @default(uuid())
+  orderId            String   @map("order_id")
+  photoId            String   @map("photo_id")
+  productVariantId   String   @map("product_variant_id")
+  quantity           Int      @default(1)
+  unitPrice          Decimal  @map("unit_price") @db.Decimal(10, 2)
+  totalPrice         Decimal  @map("total_price") @db.Decimal(10, 2)
+  customizationData  Json?    @map("customization_data")
+  printfulOrderId    String?  @map("printful_order_id")
+  gootenOrderId      String?  @map("gooten_order_id")
+  fulfillmentStatus  String   @default("pending") @map("fulfillment_status")
+  fulfillmentProvider String? @map("fulfillment_provider") // printful, gooten
+  trackingNumber     String?  @map("tracking_number")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  order          Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  photo          Photo          @relation(fields: [photoId], references: [id], onDelete: Cascade)
+  productVariant ProductVariant @relation(fields: [productVariantId], references: [id])
+
+  @@map("order_items")
+}
+
+// Family groups
+model Family {
+  id              String   @id @default(uuid())
+  primaryParentId String   @map("primary_parent_id")
+  familyName      String?  @map("family_name")
+  notes           String?
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  // Relations
+  primaryParent User          @relation("FamilyPrimaryParent", fields: [primaryParentId], references: [id])
+  children      FamilyChild[]
+
+  @@map("families")
+}
+
+// Link children to families
+model FamilyChild {
+  familyId String @map("family_id")
+  childId  String @map("child_id")
+
+  // Relations
+  family Family @relation(fields: [familyId], references: [id])
+  child  Child  @relation(fields: [childId], references: [id])
+
+  @@id([familyId, childId])
+  @@map("family_children")
+}
+
+// Application settings
+model Setting {
+  id          String   @id @default(uuid())
+  category    String
+  key         String
+  value       String?
+  valueType   String   @default("string") @map("value_type") // string, number, boolean, json
+  description String?
+  isPublic    Boolean  @default(false) @map("is_public")
+  updatedBy   String?  @map("updated_by")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  // Relations
+  updater User? @relation("SettingUpdater", fields: [updatedBy], references: [id])
+
+  @@unique([category, key])
+  @@map("settings")
+}
+
+// Audit trail
+model AuditLog {
+  id           String   @id @default(uuid())
+  userId       String?  @map("user_id")
+  action       String
+  resourceType String?  @map("resource_type")
+  resourceId   String?  @map("resource_id")
+  oldValues    Json?    @map("old_values")
+  newValues    Json?    @map("new_values")
+  ipAddress    String?  @map("ip_address")
+  userAgent    String?  @map("user_agent")
+  sessionId    String?  @map("session_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+// Notifications
+model Notification {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  type      String    // email, sms, push, in_app
+  title     String
+  message   String
+  actionUrl String?   @map("action_url")
+  status    String    @default("pending") // pending, sent, delivered, failed, read
+  sentAt    DateTime? @map("sent_at")
+  readAt    DateTime? @map("read_at")
+  metadata  Json?
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
