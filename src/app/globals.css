@@ -3,6 +3,7 @@
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-oswald: var(--font-oswald);
 }
 
 /* Punk Rock Color Palette CSS Variables */
@@ -58,4 +59,50 @@ body {
 
 .animate-marquee {
   animation: marquee 20s linear infinite;
+}
+
+/* Parallax effect for hero image */
+.hero-parallax-container {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Create parallax on scroll */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-parallax-container {
+    animation: parallax-float 6s ease-in-out infinite;
+  }
+}
+
+@keyframes parallax-float {
+  0% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-30px) scale(1.05);
+  }
+  100% {
+    transform: translateY(0px) scale(1);
+  }
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .hero-parallax-container {
+    animation: none;
+    transform: none;
+  }
+}
+
+/* Punk rock typography */
+.punk-text {
+  font-family: var(--font-oswald);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.punk-text-bold {
+  font-family: var(--font-oswald);
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }

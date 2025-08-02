@@ -10,16 +10,52 @@ export default function Home() {
       {/* Hero Section - Agency Side Style */}
       <div className="relative min-h-screen flex items-center justify-center px-6 lg:px-8 overflow-hidden">
         {/* Background Hero Image */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/images/homepage/hero_mast.jpg"
-            alt="Rock star kids background"
-            fill
-            className="object-cover"
-            priority
-          />
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <div className="hero-parallax-container h-[120%] w-full absolute -top-[10%]">
+            <Image
+              src="/images/homepage/hero_mast.jpg"
+              alt="Rock star kids background"
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
           {/* Horizontal gradient overlay - dark left, transparent right */}
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/20"></div>
+          
+          {/* Grunge torn edge effect - cuts into the image itself */}
+          <div 
+            className="absolute bottom-0 left-0 right-0 h-20 z-10"
+            style={{
+              background: `
+                radial-gradient(ellipse 120px 40px at 8% 100%, black 45%, transparent 46%),
+                radial-gradient(ellipse 90px 30px at 18% 100%, black 45%, transparent 46%),
+                radial-gradient(ellipse 110px 35px at 28% 100%, black 45%, transparent 46%),
+                radial-gradient(ellipse 85px 25px at 38% 100%, black 45%, transparent 46%),
+                radial-gradient(ellipse 130px 45px at 48% 100%, black 45%, transparent 46%),
+                radial-gradient(ellipse 95px 32px at 58% 100%, black 45%, transparent 46%),
+                radial-gradient(ellipse 105px 38px at 68% 100%, black 45%, transparent 46%),
+                radial-gradient(ellipse 88px 28px at 78% 100%, black 45%, transparent 46%),
+                radial-gradient(ellipse 115px 42px at 88% 100%, black 45%, transparent 46%),
+                radial-gradient(ellipse 100px 35px at 98% 100%, black 45%, transparent 46%)
+              `
+            }}
+          ></div>
+          
+          {/* Additional torn paper texture */}
+          <div 
+            className="absolute bottom-0 left-0 right-0 h-12 z-10"
+            style={{
+              background: `
+                radial-gradient(ellipse 60px 20px at 12% 100%, black 40%, transparent 41%),
+                radial-gradient(ellipse 45px 15px at 25% 100%, black 40%, transparent 41%),
+                radial-gradient(ellipse 70px 25px at 40% 100%, black 40%, transparent 41%),
+                radial-gradient(ellipse 55px 18px at 55% 100%, black 40%, transparent 41%),
+                radial-gradient(ellipse 65px 22px at 70% 100%, black 40%, transparent 41%),
+                radial-gradient(ellipse 50px 16px at 85% 100%, black 40%, transparent 41%)
+              `
+            }}
+          ></div>
         </div>
         
         {/* Main Hero Content */}
@@ -193,7 +229,7 @@ export default function Home() {
             <div className="space-y-12">
               <div>
                 <h2 className="text-5xl md:text-6xl font-black text-white mb-8">THE GIST</h2>
-                <p className="text-gray-300 text-lg leading-relaxed">
+                <p className="text-gray-300 text-lg leading-relaxed punk-text">
                   Electric Muse is the alternative to boring photo studios and cookie-cutter portraits. 
                   Think of it as therapy for parents tired of stiff, artificial photos where kids are 
                   told to sit still and smile. We're an edgy collective of photographers, stylists, 
@@ -206,7 +242,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent mb-2">
                     WHAT WE DO
                   </h3>
-                  <p className="text-gray-300">
+                  <p className="text-gray-300 punk-text">
                     Transform your kids into rock stars with professional styling, instruments, and attitude coaching.
                   </p>
                 </div>
@@ -215,7 +251,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent mb-2">
                     HOW WE DO IT
                   </h3>
-                  <p className="text-gray-300">
+                  <p className="text-gray-300 punk-text">
                     Through authentic styling, real instruments, smoke machines, and letting kids be their wildest selves.
                   </p>
                 </div>
@@ -224,7 +260,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent mb-2">
                     WHERE WE DO IT
                   </h3>
-                  <p className="text-gray-300">
+                  <p className="text-gray-300 punk-text">
                     Professional studio with authentic rock stage setup and lighting.
                   </p>
                 </div>
@@ -233,7 +269,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent mb-2">
                     WHEN WE DO IT
                   </h3>
-                  <p className="text-gray-300">
+                  <p className="text-gray-300 punk-text">
                     Year-round sessions with seasonal rock themes and special events.
                   </p>
                 </div>
@@ -269,8 +305,8 @@ export default function Home() {
                 <h3 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent mb-4">
                   ROCK STAR EXPERIENCE '25
                 </h3>
-                <p className="text-gray-300 text-lg mb-2">Available year-round @ studio sessions</p>
-                <p className="text-gray-300 text-lg">
+                <p className="text-gray-300 text-lg mb-2 punk-text">Available year-round @ studio sessions</p>
+                <p className="text-gray-300 text-lg punk-text">
                   <span className="underline">Professional Photography Studio</span> - Your Location
                 </p>
               </div>
@@ -415,7 +451,7 @@ export default function Home() {
           <h2 className="text-5xl md:text-6xl font-black text-white mb-8">
             WANT TO GET INVOLVED?
           </h2>
-          <p className="text-gray-300 text-xl mb-12">
+          <p className="text-gray-300 text-xl mb-12 punk-text">
             Ready to transform your little one into a rock legend?
           </p>
           
