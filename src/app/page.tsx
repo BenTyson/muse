@@ -8,12 +8,25 @@ export default function Home() {
       <NavigationWrapper />
       
       {/* Hero Section - Agency Side Style */}
-      <div className="relative min-h-screen flex items-center justify-center px-6 lg:px-8">
+      <div className="relative min-h-screen flex items-center justify-center px-6 lg:px-8 overflow-hidden">
+        {/* Background Hero Image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/homepage/hero_mast.jpg"
+            alt="Rock star kids background"
+            fill
+            className="object-cover"
+            priority
+          />
+          {/* Horizontal gradient overlay - dark left, transparent right */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/20"></div>
+        </div>
+        
         {/* Main Hero Content */}
         <div className="relative z-10 w-full max-w-7xl mx-auto pt-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Side - Typography */}
-            <div className="space-y-8 relative z-20">
+          <div className="relative">
+            {/* Left Side - Typography - Now with more space */}
+            <div className="space-y-8 relative z-20 lg:w-[65%]">
               <h1 className="text-6xl md:text-8xl lg:text-9xl font-black leading-none tracking-tight">
                 <span className="block text-white">THE</span>
                 <span className="block bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent">
@@ -50,10 +63,10 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Right Side - Hero Image with decorative elements */}
-            <div className="relative z-10">
+            {/* Right Side - Decorative elements only */}
+            <div className="absolute top-0 right-0 lg:w-[45%] h-full flex items-center justify-center z-10">
               {/* Starburst decoration */}
-              <div className="absolute -top-20 -right-20 w-80 h-80 opacity-30">
+              <div className="absolute -top-20 -right-20 w-80 h-80 opacity-20">
                 <div className="relative w-full h-full">
                   {Array.from({ length: 24 }).map((_, i) => (
                     <div
@@ -71,25 +84,6 @@ export default function Home() {
                 </div>
               </div>
               
-              {/* Main hero image */}
-              <div className="relative aspect-square max-w-lg mx-auto">
-                <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 to-cyan-400/20 rounded-3xl transform rotate-3"></div>
-                <Image
-                  src="/images/homepage/hero_mast.jpg"
-                  alt="Rock star kid transformation"
-                  fill
-                  className="object-cover rounded-3xl"
-                  priority
-                />
-                
-                {/* Decorative badge */}
-                <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-gradient-to-r from-pink-500 to-cyan-400 rounded-full flex items-center justify-center transform rotate-12">
-                  <div className="text-center">
-                    <div className="text-black font-black text-xs">100%</div>
-                    <div className="text-black font-black text-xs">ROCK</div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
