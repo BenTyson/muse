@@ -229,7 +229,7 @@ export default function Home() {
             <div className="space-y-12">
               <div>
                 <h2 className="text-5xl md:text-6xl font-black text-white mb-8">THE GIST</h2>
-                <p className="text-gray-300 text-lg leading-relaxed punk-text">
+                <p className="text-gray-300 text-lg leading-relaxed font-oswald">
                   Electric Muse is the alternative to boring photo studios and cookie-cutter portraits. 
                   Think of it as therapy for parents tired of stiff, artificial photos where kids are 
                   told to sit still and smile. We're an edgy collective of photographers, stylists, 
@@ -242,7 +242,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent mb-2">
                     WHAT WE DO
                   </h3>
-                  <p className="text-gray-300 punk-text">
+                  <p className="text-gray-300 font-oswald">
                     Transform your kids into rock stars with professional styling, instruments, and attitude coaching.
                   </p>
                 </div>
@@ -251,7 +251,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent mb-2">
                     HOW WE DO IT
                   </h3>
-                  <p className="text-gray-300 punk-text">
+                  <p className="text-gray-300 font-oswald">
                     Through authentic styling, real instruments, smoke machines, and letting kids be their wildest selves.
                   </p>
                 </div>
@@ -260,7 +260,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent mb-2">
                     WHERE WE DO IT
                   </h3>
-                  <p className="text-gray-300 punk-text">
+                  <p className="text-gray-300 font-oswald">
                     Professional studio with authentic rock stage setup and lighting.
                   </p>
                 </div>
@@ -269,7 +269,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent mb-2">
                     WHEN WE DO IT
                   </h3>
-                  <p className="text-gray-300 punk-text">
+                  <p className="text-gray-300 font-oswald">
                     Year-round sessions with seasonal rock themes and special events.
                   </p>
                 </div>
@@ -305,8 +305,8 @@ export default function Home() {
                 <h3 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent mb-4">
                   ROCK STAR EXPERIENCE '25
                 </h3>
-                <p className="text-gray-300 text-lg mb-2 punk-text">Available year-round @ studio sessions</p>
-                <p className="text-gray-300 text-lg punk-text">
+                <p className="text-gray-300 text-lg mb-2 font-oswald">Available year-round @ studio sessions</p>
+                <p className="text-gray-300 text-lg font-oswald">
                   <span className="underline">Professional Photography Studio</span> - Your Location
                 </p>
               </div>
@@ -451,7 +451,7 @@ export default function Home() {
           <h2 className="text-5xl md:text-6xl font-black text-white mb-8">
             WANT TO GET INVOLVED?
           </h2>
-          <p className="text-gray-300 text-xl mb-12 punk-text">
+          <p className="text-gray-300 text-xl mb-12 font-oswald">
             Ready to transform your little one into a rock legend?
           </p>
           

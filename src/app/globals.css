@@ -94,15 +94,3 @@ body {
   }
 }
 
-/* Punk rock typography */
-.punk-text {
-  font-family: var(--font-oswald);
-  font-weight: 400;
-  letter-spacing: 0.02em;
-}
-
-.punk-text-bold {
-  font-family: var(--font-oswald);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
