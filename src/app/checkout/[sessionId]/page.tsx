@@ -34,9 +34,10 @@ interface PaymentState {
   savings: number
 }
 
-export default function CheckoutPage({ params }: { params: { sessionId: string } }) {
+export default function CheckoutPage({ params }: { params: Promise<{ sessionId: string }> }) {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const [sessionId, setSessionId] = useState<string | null>(null)
   const [sessionData, setSessionData] = useState<SessionData | null>(null)
   const [selectedPlan, setSelectedPlan] = useState<PaymentPlanId | null>(null)
   const [paymentState, setPaymentState] = useState<PaymentState>({
@@ -49,6 +50,15 @@ export default function CheckoutPage({ params }: { params: { sessionId: string }
   const [error, setError] = useState<string | null>(null)
   const [step, setStep] = useState<'plan' | 'payment' | 'success'>('plan')
 
+  // Unwrap params
+  useEffect(() => {
+    async function getParams() {
+      const resolvedParams = await params
+      setSessionId(resolvedParams.sessionId)
+    }
+    getParams()
+  }, [params])
+
   useEffect(() => {
     if (status === 'unauthenticated') {
       redirect('/login')
@@ -56,14 +66,16 @@ export default function CheckoutPage({ params }: { params: { sessionId: string }
   }, [status])
 
   useEffect(() => {
-    if (status === 'authenticated') {
+    if (status === 'authenticated' && sessionId) {
       fetchSessionData()
     }
-  }, [status, params.sessionId])
+  }, [status, sessionId])
 
   const fetchSessionData = async () => {
+    if (!sessionId) return
+    
     try {
-      const response = await fetch(`/api/sessions/${params.sessionId}`)
+      const response = await fetch(`/api/sessions/${sessionId}`)
       if (response.ok) {
         const data = await response.json()
         setSessionData(data)

@@ -89,7 +89,7 @@ export default function DateTimeSelector({
             </svg>
           </button>
           
-          <span className="text-lg font-medium">
+          <span className="text-lg font-medium text-gray-900">
             {format(currentWeekStart, 'MMM d')} - {format(endOfWeek(currentWeekStart, { weekStartsOn: 1 }), 'MMM d, yyyy')}
           </span>
           

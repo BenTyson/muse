@@ -8,8 +8,10 @@ async function main() {
 
   // Create admin user
   const adminPassword = await bcrypt.hash('admin123', 12)
-  const adminUser = await prisma.user.create({
-    data: {
+  const adminUser = await prisma.user.upsert({
+    where: { email: 'admin@electricmuse.com' },
+    update: {},
+    create: {
       email: 'admin@electricmuse.com',
       passwordHash: adminPassword,
       firstName: 'Admin',
@@ -19,7 +21,24 @@ async function main() {
       marketingConsent: true,
     },
   })
-  console.log('✅ Created admin user:', adminUser.email)
+  console.log('✅ Admin user ready:', adminUser.email)
+
+  // Create test customer user
+  const customerPassword = await bcrypt.hash('password123', 12)
+  const customerUser = await prisma.user.upsert({
+    where: { email: 'customer@test.com' },
+    update: {},
+    create: {
+      email: 'customer@test.com',
+      passwordHash: customerPassword,
+      firstName: 'Test',
+      lastName: 'Customer',
+      phone: '555-0200',
+      emailVerified: true,
+      marketingConsent: false,
+    },
+  })
+  console.log('✅ Test customer user ready:', customerUser.email)
 
   // Create sample packages
   const packages = await Promise.all([

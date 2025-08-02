@@ -353,14 +353,14 @@ function BookingForm() {
                   onChange={(e) => setSpecialRequests(e.target.value)}
                   placeholder="Any special requests or notes for your session..."
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-gray-900 placeholder:text-gray-500"
                 />
               </div>
 
               {/* Booking Summary */}
               <div className="bg-gray-50 p-4 rounded-lg mb-6">
-                <h4 className="font-medium mb-3">Booking Summary</h4>
-                <div className="space-y-2 text-sm">
+                <h4 className="font-medium mb-3 text-gray-900">Booking Summary</h4>
+                <div className="space-y-2 text-sm text-gray-900">
                   <div className="flex justify-between">
                     <span>Package: {selectedPackage.name}</span>
                     <span>${selectedPackage.basePrice}</span>

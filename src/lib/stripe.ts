@@ -1,12 +1,7 @@
 import { loadStripe, Stripe } from '@stripe/stripe-js'
-import StripeServer from 'stripe'
 
 if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
   throw new Error('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not set')
-}
-
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is not set')
 }
 
 // Client-side Stripe
@@ -17,12 +12,6 @@ export const getStripe = () => {
   }
   return stripePromise
 }
-
-// Server-side Stripe
-export const stripe = new StripeServer(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
-  typescript: true,
-})
 
 // Payment plan configurations
 export const PAYMENT_PLANS = {

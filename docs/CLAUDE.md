@@ -33,10 +33,25 @@
 - Gallery access page with password protection
 - Bulk photo download and selection features
 
-### 🔄 Next: Phase 5 E-commerce System
+### 🔄 Next: Phase 5 E-commerce System  
 - Print-on-demand integration with Printful/Gooten
 - Product catalog and shopping cart
 - Order management and fulfillment
+
+## 🐛 Bug Fixes & Improvements (Current Session)
+
+### Fixed Issues
+- **Booking Form Infinite Loop**: Resolved React useEffect infinite update loop in ChildForm component by removing problematic auto-save logic and using direct onChange handlers
+- **Stripe Configuration**: Fixed client/server-side Stripe configuration separation to prevent "STRIPE_SECRET_KEY is not set" error on client
+- **Next.js 15 Params API**: Updated checkout page and API endpoints to handle new async params format with `React.use()` pattern
+- **Text Visibility**: Fixed input text colors throughout forms by adding `text-gray-900` classes for better readability
+- **User Authentication Flow**: Created test customer user for proper booking flow testing (admin vs customer user separation)
+
+### Technical Improvements
+- Split Stripe configuration into client (`/src/lib/stripe.ts`) and server (`/src/lib/stripe-server.ts`) files
+- Implemented proper async params handling for Next.js 15 compatibility
+- Enhanced form UX with auto-saving child forms and better validation
+- Improved text contrast across all form elements
 
 ### 🎯 Current Working Features
 - User registration and authentication
@@ -322,6 +337,17 @@ npx prisma studio
 
 ## Testing Current Features
 
+### 👥 Test Users
+**Admin User:**
+- Email: `admin@electricmuse.com`
+- Password: `admin123`
+- Access: Admin panel, photo upload, gallery creation
+
+**Test Customer:**
+- Email: `customer@test.com` 
+- Password: `password123`
+- Access: Booking, payment, gallery viewing
+
 ### 🧪 Manual Testing Checklist
 
 #### Authentication Flow
@@ -332,8 +358,10 @@ npx prisma studio
 
 2. **Login**: Visit http://localhost:3000/login
    - Test with admin credentials: `admin@electricmuse.com` / `admin123`
-   - Test with regular user credentials
+   - Test with customer credentials: `customer@test.com` / `password123`
    - Should redirect to dashboard
+
+⚠️ **Important**: Use customer account for booking flow testing, admin account for photo management
 
 #### Booking Flow
 1. **Package Selection**: Visit http://localhost:3000/packages

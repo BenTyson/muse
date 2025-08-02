@@ -30,7 +30,7 @@ interface Session {
 export default function AdminSessionPhotosPage() {
   const { data: session, status } = useSession()
   const params = useParams()
-  const sessionId = params.sessionId as string
+  const sessionId = typeof params.sessionId === 'string' ? params.sessionId : params.sessionId?.[0] || ''
   
   const [sessionData, setSessionData] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)

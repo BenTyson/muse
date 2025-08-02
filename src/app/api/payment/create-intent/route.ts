@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { stripe, calculatePaymentAmounts, PaymentPlanId } from '@/lib/stripe'
-import prisma from '@/lib/prisma'
+import { calculatePaymentAmounts, PaymentPlanId } from '@/lib/stripe'
+import { stripe } from '@/lib/stripe-server'
+import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
 const createIntentSchema = z.object({
