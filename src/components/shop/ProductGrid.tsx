@@ -75,7 +75,7 @@ export default function ProductGrid({ products, selectedPhoto }: ProductGridProp
       {products.map((product) => (
         <div
           key={product.id}
-          className="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
+          className="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-punk-gray-lightest"
         >
           {/* Product Image */}
           <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
@@ -94,7 +94,7 @@ export default function ProductGrid({ products, selectedPhoto }: ProductGridProp
             
             {/* Featured Badge */}
             {product.featured && (
-              <div className="absolute top-3 left-3 bg-red-600 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+              <div className="absolute top-3 left-3 bg-primary text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
                 <Star className="w-3 h-3 fill-current" />
                 Popular
               </div>
@@ -113,8 +113,8 @@ export default function ProductGrid({ products, selectedPhoto }: ProductGridProp
               <Heart
                 className={`w-4 h-4 ${
                   favorites.has(product.id)
-                    ? 'fill-red-500 text-red-500'
-                    : 'text-gray-600'
+                    ? 'fill-primary text-primary'
+                    : 'text-punk-gray'
                 }`}
               />
             </button>
@@ -123,22 +123,22 @@ export default function ProductGrid({ products, selectedPhoto }: ProductGridProp
           {/* Product Info */}
           <div className="p-4">
             <div className="flex items-start justify-between mb-2">
-              <h3 className="font-semibold text-gray-900 group-hover:text-red-600 transition-colors">
+              <h3 className="font-semibold text-punk-dark group-hover:text-primary transition-colors">
                 {product.name}
               </h3>
               <div className="text-right">
-                <div className="text-lg font-bold text-gray-900">
+                <div className="text-lg font-bold text-punk-dark">
                   ${product.basePrice}
                 </div>
                 {product.variants.length > 1 && (
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-punk-gray">
                     from ${Math.min(...product.variants.map(v => v.price))}
                   </div>
                 )}
               </div>
             </div>
 
-            <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+            <p className="text-sm text-punk-gray mb-3 line-clamp-2">
               {product.shortDescription}
             </p>
 
@@ -154,13 +154,13 @@ export default function ProductGrid({ products, selectedPhoto }: ProductGridProp
                   {product.variants.slice(0, 4).map((variant, index) => (
                     <div
                       key={variant.id}
-                      className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-700"
+                      className="px-2 py-1 bg-punk-gray-lightest rounded text-xs text-punk-gray"
                     >
                       {variant.size || variant.color || `Option ${index + 1}`}
                     </div>
                   ))}
                   {product.variants.length > 4 && (
-                    <div className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-500">
+                    <div className="px-2 py-1 bg-punk-gray-lightest rounded text-xs text-punk-gray">
                       +{product.variants.length - 4}
                     </div>
                   )}
@@ -176,14 +176,14 @@ export default function ProductGrid({ products, selectedPhoto }: ProductGridProp
               >
                 <Button
                   variant="outline"
-                  className="w-full text-sm hover:bg-gray-50"
+                  className="w-full text-sm hover:bg-punk-gray-lightest"
                 >
                   Customize
                 </Button>
               </Link>
               <Button
                 onClick={() => handleAddToCart(product)}
-                className="bg-red-600 hover:bg-red-700 text-white px-4"
+                className="bg-primary hover:bg-primary-dark text-white px-4"
                 size="sm"
               >
                 <ShoppingCart className="w-4 h-4" />

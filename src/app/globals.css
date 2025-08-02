@@ -1,26 +1,51 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Punk Rock Color Palette CSS Variables */
+:root {
+  /* Base colors as RGB values for Tailwind opacity support */
+  --color-rose-red: 185 32 86;           /* #B92056 */
+  --color-flame: 232 86 39;              /* #E85627 */
+  --color-maximum-yellow-red: 240 181 77; /* #F0B54D */
+  --color-palatinate-purple: 104 41 87;   /* #682957 */
+  --color-green-sheen: 103 185 169;      /* #67B9A9 */
+  --color-metallic-blue: 43 89 131;      /* #2B5983 */
+  
+  /* Semantic mappings */
+  --color-primary: var(--color-rose-red);
+  --color-primary-dark: 165 24 71;       /* darken rose-red 10% */
+  --color-primary-light: 206 56 110;     /* lighten rose-red 15% */
+  
+  --color-secondary: var(--color-metallic-blue);
+  --color-secondary-dark: 33 72 112;     /* darken metallic-blue 10% */
+  --color-secondary-light: 63 117 160;   /* lighten metallic-blue 15% */
+  
+  --color-accent: var(--color-flame);
+  --color-accent-dark: 209 68 31;        /* darken flame 10% */
+  --color-accent-light: 245 121 79;      /* lighten flame 15% */
+  
+  --color-warning: var(--color-maximum-yellow-red);
+  --color-success: var(--color-green-sheen);
+  --color-purple: var(--color-palatinate-purple);
+  
+  /* Gray scale */
+  --color-gray-100: 247 248 249;
+  --color-gray-200: 225 229 233;
+  --color-gray-300: 197 205 214;
+  --color-gray-400: 160 171 184;
+  --color-gray-500: 107 119 133;
+  --color-gray-600: 74 85 104;
+  --color-gray-700: 45 55 72;
+  --color-gray-800: 26 32 44;
+  --color-gray-900: 23 25 35;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: #ffffff;
+  color: rgb(var(--color-gray-900));
   font-family: Arial, Helvetica, sans-serif;
 }

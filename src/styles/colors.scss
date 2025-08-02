@@ -1,0 +1,112 @@
+// Punk Rock Color Palette
+// Source: Your specified color palette
+
+// Base Colors
+$rose-red: #B92056;          // Rose Red
+$flame: #E85627;             // Flame  
+$maximum-yellow-red: #F0B54D; // Maximum Yellow Red
+$palatinate-purple: #682957;  // Palatinate Purple
+$green-sheen: #67B9A9;       // Green Sheen
+$metallic-blue: #2B5983;     // Metallic Blue
+
+// Semantic Color Mappings
+$primary: $rose-red;         // Main brand color
+$primary-dark: darken($rose-red, 10%);
+$primary-light: lighten($rose-red, 15%);
+
+$secondary: $metallic-blue;  // Secondary brand color
+$secondary-dark: darken($metallic-blue, 10%);
+$secondary-light: lighten($metallic-blue, 15%);
+
+$accent: $flame;             // Accent color
+$accent-dark: darken($flame, 10%);
+$accent-light: lighten($flame, 15%);
+
+$warning: $maximum-yellow-red; // Warning/gold color
+$success: $green-sheen;        // Success/teal color
+$purple: $palatinate-purple;   // Purple accent
+
+// Neutral Colors
+$black: #000000;
+$white: #FFFFFF;
+$gray-100: #F7F8F9;
+$gray-200: #E1E5E9;
+$gray-300: #C5CDD6;
+$gray-400: #A0ABB8;
+$gray-500: #6B7785;
+$gray-600: #4A5568;
+$gray-700: #2D3748;
+$gray-800: #1A202C;
+$gray-900: #171923;
+
+// Background Colors
+$bg-light: $white;
+$bg-dark: $gray-900;
+$bg-muted: $gray-100;
+
+// Text Colors
+$text-primary: $gray-900;
+$text-secondary: $gray-600;
+$text-muted: $gray-500;
+$text-light: $white;
+
+// Border Colors
+$border-light: $gray-200;
+$border-medium: $gray-300;
+$border-dark: $gray-400;
+
+// State Colors
+$error: #DC2626;
+$info: $metallic-blue;
+
+// CSS Custom Properties for Tailwind Integration
+:root {
+  // Base colors as RGB values for Tailwind opacity support
+  --color-rose-red: #{red($rose-red)} #{green($rose-red)} #{blue($rose-red)};
+  --color-flame: #{red($flame)} #{green($flame)} #{blue($flame)};
+  --color-maximum-yellow-red: #{red($maximum-yellow-red)} #{green($maximum-yellow-red)} #{blue($maximum-yellow-red)};
+  --color-palatinate-purple: #{red($palatinate-purple)} #{green($palatinate-purple)} #{blue($palatinate-purple)};
+  --color-green-sheen: #{red($green-sheen)} #{green($green-sheen)} #{blue($green-sheen)};
+  --color-metallic-blue: #{red($metallic-blue)} #{green($metallic-blue)} #{blue($metallic-blue)};
+  
+  // Semantic mappings
+  --color-primary: var(--color-rose-red);
+  --color-primary-dark: #{red(darken($rose-red, 10%))} #{green(darken($rose-red, 10%))} #{blue(darken($rose-red, 10%))};
+  --color-primary-light: #{red(lighten($rose-red, 15%))} #{green(lighten($rose-red, 15%))} #{blue(lighten($rose-red, 15%))};
+  
+  --color-secondary: var(--color-metallic-blue);
+  --color-secondary-dark: #{red(darken($metallic-blue, 10%))} #{green(darken($metallic-blue, 10%))} #{blue(darken($metallic-blue, 10%))};
+  --color-secondary-light: #{red(lighten($metallic-blue, 15%))} #{green(lighten($metallic-blue, 15%))} #{blue(lighten($metallic-blue, 15%))};
+  
+  --color-accent: var(--color-flame);
+  --color-accent-dark: #{red(darken($flame, 10%))} #{green(darken($flame, 10%))} #{blue(darken($flame, 10%))};
+  --color-accent-light: #{red(lighten($flame, 15%))} #{green(lighten($flame, 15%))} #{blue(lighten($flame, 15%))};
+  
+  --color-warning: var(--color-maximum-yellow-red);
+  --color-success: var(--color-green-sheen);
+  --color-purple: var(--color-palatinate-purple);
+  
+  // Grays
+  --color-gray-100: 247 248 249;
+  --color-gray-200: 225 229 233;
+  --color-gray-300: 197 205 214;
+  --color-gray-400: 160 171 184;
+  --color-gray-500: 107 119 133;
+  --color-gray-600: 74 85 104;
+  --color-gray-700: 45 55 72;
+  --color-gray-800: 26 32 44;
+  --color-gray-900: 23 25 35;
+}
+
+// Utility Classes
+.text-brand { color: $primary; }
+.text-accent { color: $accent; }
+.text-warning { color: $warning; }
+.text-success { color: $success; }
+.text-purple { color: $purple; }
+
+.bg-brand { background-color: $primary; }
+.bg-accent { background-color: $accent; }
+.bg-warning { background-color: $warning; }
+.bg-success { background-color: $success; }
+.bg-purple { background-color: $purple; }

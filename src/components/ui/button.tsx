@@ -2,7 +2,7 @@ import * as React from 'react'
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline'
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost'
   size?: 'sm' | 'md' | 'lg'
   isLoading?: boolean
 }
@@ -20,9 +20,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const baseStyles = 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
     
     const variants = {
-      primary: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
-      secondary: 'bg-gray-800 text-white hover:bg-gray-900 focus:ring-gray-500',
-      outline: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-gray-500',
+      primary: 'bg-primary text-white hover:bg-primary-dark focus:ring-primary',
+      secondary: 'bg-secondary text-white hover:bg-secondary-dark focus:ring-secondary',
+      outline: 'border border-punk-gray-light bg-white text-punk-gray hover:bg-punk-gray-lightest focus:ring-punk-gray',
+      ghost: 'text-punk-gray hover:bg-punk-gray/10 hover:text-punk-dark focus:ring-punk-gray',
     }
     
     const sizes = {

@@ -48,8 +48,8 @@ export default function Navigation() {
                     href={item.href}
                     className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       isActive
-                        ? 'bg-red-50 text-red-600'
-                        : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-gray-600 hover:text-primary hover:bg-gray-100'
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -70,7 +70,7 @@ export default function Navigation() {
                 <div className="hidden md:flex items-center space-x-3">
                   <div className="flex items-center space-x-2">
                     <User className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm text-gray-600">
                       {session.user?.firstName || session.user?.email}
                     </span>
                   </div>
@@ -78,7 +78,7 @@ export default function Navigation() {
                     variant="ghost"
                     size="sm"
                     onClick={() => signOut()}
-                    className="text-gray-700 hover:text-red-600"
+                    className="text-gray-600 hover:text-primary"
                   >
                     <LogOut className="w-4 h-4" />
                   </Button>
@@ -87,7 +87,7 @@ export default function Navigation() {
                 {/* Mobile menu button */}
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+                  className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-400 hover:bg-gray-100"
                 >
                   {mobileMenuOpen ? (
                     <X className="w-6 h-6" />
@@ -123,8 +123,8 @@ export default function Navigation() {
                     onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       isActive
-                        ? 'bg-red-50 text-red-600'
-                        : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-gray-600 hover:text-primary hover:bg-gray-100'
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -136,7 +136,7 @@ export default function Navigation() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <User className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm text-gray-600">
                       {session.user?.firstName || session.user?.email}
                     </span>
                   </div>
@@ -144,7 +144,7 @@ export default function Navigation() {
                     variant="ghost"
                     size="sm"
                     onClick={() => signOut()}
-                    className="text-gray-700 hover:text-red-600"
+                    className="text-gray-600 hover:text-primary"
                   >
                     <LogOut className="w-4 h-4" />
                   </Button>
