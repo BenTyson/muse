@@ -10,15 +10,15 @@ export default function Home() {
       {/* Hero Section with Background Image */}
       <div className="relative isolate min-h-[90vh] flex items-center">
         {/* Hero Background Image */}
-        <div className="absolute inset-0 z-0 relative">
+        <div className="absolute inset-0 z-0">
           <Image
             src="/images/homepage/hero_mast.jpg"
             alt="Rock star kid"
             fill
-            className="object-cover opacity-40"
+            className="object-cover opacity-60"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/20" />
         </div>
         
         {/* Hero Content */}
@@ -28,14 +28,15 @@ export default function Home() {
               <h1 className="text-5xl font-bold tracking-tight text-white sm:text-7xl">
                 Electric Muse
               </h1>
-              <p className="mt-6 text-xl leading-8 text-gray-200">
+              <p className="mt-6 text-xl leading-8 text-gray-100">
                 Transform your little ones into rock stars! Professional photography sessions 
                 with punk rock styling for the coolest kids in town.
               </p>
               <div className="mt-10 flex items-center justify-center gap-x-6">
                 <Link
                   href="/packages"
-                  className="rounded-full bg-primary px-6 py-3 text-lg font-semibold text-white shadow-sm hover:bg-primary-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-all hover:scale-105"
+                  className="rounded-full px-6 py-3 text-lg font-semibold text-white shadow-sm transition-all hover:scale-105"
+                  style={{backgroundColor: 'rgb(185, 32, 86)', borderColor: 'rgb(185, 32, 86)'}}
                 >
                   Book a Session
                 </Link>
@@ -52,7 +53,7 @@ export default function Home() {
       </div>
 
       {/* Gallery Preview Section */}
-      <div className="bg-gray-900 py-24 sm:py-32">
+      <div className="bg-black py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
@@ -71,7 +72,7 @@ export default function Home() {
               { src: 'https://images.unsplash.com/photo-1603356033288-acfcb54801e6?w=800&h=800&fit=crop', alt: 'Boy with sunglasses' },
               { src: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=800&fit=crop', alt: 'Girl with violin' }
             ].map((image, idx) => (
-              <div key={idx} className="relative aspect-square overflow-hidden rounded-2xl bg-gray-900 group hover:scale-105 transition-transform duration-300">
+              <div key={idx} className="relative aspect-square overflow-hidden rounded-2xl bg-black group hover:scale-105 transition-transform duration-300">
                 <Image
                   src={image.src}
                   alt={image.alt}
@@ -87,7 +88,8 @@ export default function Home() {
           <div className="mt-10 text-center">
             <Link
               href="/shop"
-              className="text-primary hover:text-primary-light font-semibold text-lg"
+              className="font-semibold text-lg hover:text-pink-300"
+              style={{color: 'rgb(185, 32, 86)'}}
             >
               Shop Our Gallery <span aria-hidden="true">→</span>
             </Link>
@@ -98,7 +100,7 @@ export default function Home() {
       {/* Features Section with Images */}
       <div className="mx-auto max-w-7xl px-6 lg:px-8 py-24 sm:py-32">
         <div className="mx-auto max-w-2xl lg:text-center">
-          <h2 className="text-base font-semibold leading-7 text-primary">Rock Star Experience</h2>
+          <h2 className="text-base font-semibold leading-7" style={{color: 'rgb(185, 32, 86)'}}>Rock Star Experience</h2>
           <p className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Everything you need for an unforgettable photo session
           </p>
@@ -108,7 +110,7 @@ export default function Home() {
         <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             {/* Professional Styling */}
-            <div className="relative overflow-hidden rounded-2xl bg-gray-900">
+            <div className="relative overflow-hidden rounded-2xl bg-black">
               <div className="aspect-[16/9] relative">
                 <Image
                   src="https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=600&h=400&fit=crop"
@@ -130,7 +132,7 @@ export default function Home() {
             </div>
 
             {/* Studio Quality */}
-            <div className="relative overflow-hidden rounded-2xl bg-gray-900">
+            <div className="relative overflow-hidden rounded-2xl bg-black">
               <div className="aspect-[16/9] relative">
                 <Image
                   src="https://images.unsplash.com/photo-1598387993441-a364f854c3e1?w=600&h=400&fit=crop"
@@ -152,7 +154,7 @@ export default function Home() {
             </div>
 
             {/* Print Products */}
-            <div className="relative overflow-hidden rounded-2xl bg-gray-900">
+            <div className="relative overflow-hidden rounded-2xl bg-black">
               <div className="aspect-[16/9] relative">
                 <Image
                   src="https://i.pinimg.com/474x/52/4a/66/524a667f1948e91db490694380b1ae42.jpg"
@@ -177,7 +179,7 @@ export default function Home() {
       </div>
 
       {/* Testimonial Section */}
-      <div className="bg-gray-900 py-24 sm:py-32">
+      <div className="bg-black py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
@@ -187,19 +189,19 @@ export default function Home() {
               "My daughter felt like a real rock star! The team was amazing with kids and the 
               photos are absolutely stunning. We'll treasure these forever!"
             </p>
-            <p className="mt-4 text-primary font-semibold">- Sarah M.</p>
+            <p className="mt-4 font-semibold" style={{color: 'rgb(185, 32, 86)'}}>- Sarah M.</p>
           </div>
         </div>
       </div>
 
       {/* CTA Section */}
-      <div className="bg-primary py-16">
+      <div className="py-16" style={{backgroundColor: 'rgb(185, 32, 86)'}}>
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-white">
               Ready to Rock?
             </h2>
-            <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-primary-light">
+            <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-pink-200">
               Book your session today and give your little rock star an experience they'll never forget!
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
@@ -211,7 +213,7 @@ export default function Home() {
               </Link>
               <Link
                 href="/register"
-                className="text-lg font-semibold leading-6 text-white hover:text-primary-light"
+                className="text-lg font-semibold leading-6 text-white hover:text-pink-200"
               >
                 Create Account <span aria-hidden="true">→</span>
               </Link>
