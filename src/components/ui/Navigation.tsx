@@ -33,7 +33,7 @@ export default function Navigation() {
             <Link href="/" className="flex items-center space-x-4 group">
               {/* Circular logo with gradient */}
               <div className="relative">
-                <div className="w-14 h-14 bg-gradient-to-r from-pink-500 to-cyan-400 rounded-full flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
+                <div className="w-14 h-14 gradient-secondary rounded-full flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
                   <span className="text-black font-black text-xl">EM</span>
                 </div>
                 {/* Small decorative ring */}
@@ -41,7 +41,7 @@ export default function Navigation() {
               </div>
               <div className="hidden sm:block">
                 <div className="text-white font-black text-xl tracking-tight">ELECTRIC</div>
-                <div className="text-transparent bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text font-black text-xl tracking-tight -mt-1">MUSE</div>
+                <div className="text-transparent gradient-primary bg-clip-text font-black text-xl tracking-tight -mt-1">MUSE</div>
               </div>
             </Link>
           </div>
@@ -65,8 +65,8 @@ export default function Navigation() {
                     {/* Background gradient that appears on hover/active */}
                     <div className={`absolute inset-0 rounded-full transition-all duration-300 ${
                       isActive 
-                        ? 'bg-gradient-to-r from-cyan-400 to-pink-500 scale-100' 
-                        : 'bg-gradient-to-r from-cyan-400 to-pink-500 scale-0 group-hover:scale-100'
+                        ? 'gradient-primary scale-100' 
+                        : 'gradient-primary scale-0 group-hover:scale-100'
                     }`}></div>
                     
                     {/* Content */}
@@ -77,7 +77,7 @@ export default function Navigation() {
                     
                     {/* Decorative dot for active state */}
                     {isActive && (
-                      <div className="absolute -bottom-2 left-1/2 w-2 h-2 bg-gradient-to-r from-pink-500 to-cyan-400 rounded-full transform -translate-x-1/2"></div>
+                      <div className="absolute -bottom-2 left-1/2 w-2 h-2 gradient-secondary rounded-full transform -translate-x-1/2"></div>
                     )}
                   </Link>
                 )
@@ -97,7 +97,7 @@ export default function Navigation() {
                   >
                     <ShoppingBag className="w-6 h-6" />
                     {/* Cart count badge if needed */}
-                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-pink-500 to-cyan-400 rounded-full flex items-center justify-center">
+                    <div className="absolute -top-1 -right-1 w-5 h-5 gradient-secondary rounded-full flex items-center justify-center">
                       <span className="text-black font-bold text-xs">0</span>
                     </div>
                   </button>
@@ -106,7 +106,7 @@ export default function Navigation() {
                 {/* User Menu - Desktop */}
                 <div className="hidden lg:flex items-center space-x-4">
                   <div className="flex items-center space-x-3 px-4 py-2 bg-gray-900 rounded-full border border-gray-700">
-                    <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-cyan-400 rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 gradient-secondary rounded-full flex items-center justify-center">
                       <User className="w-4 h-4 text-black" />
                     </div>
                     <span className="text-white font-semibold text-sm">
@@ -142,7 +142,7 @@ export default function Navigation() {
                   </button>
                 </Link>
                 <Link href="/register">
-                  <button className="px-6 py-3 text-black font-bold bg-gradient-to-r from-cyan-400 to-pink-500 rounded-full hover:scale-105 transition-transform duration-300">
+                  <button className="px-6 py-3 text-black font-bold gradient-primary rounded-full hover:scale-105 transition-transform duration-300">
                     SIGN UP
                   </button>
                 </Link>
@@ -165,7 +165,7 @@ export default function Navigation() {
                     onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center space-x-4 px-4 py-4 rounded-2xl font-bold transition-all duration-300 ${
                       isActive
-                        ? 'bg-gradient-to-r from-cyan-400 to-pink-500 text-black'
+                        ? 'gradient-primary text-black'
                         : 'text-white hover:bg-gray-800'
                     }`}
                   >
@@ -179,7 +179,7 @@ export default function Navigation() {
               <div className="pt-6 border-t border-gray-700 mt-6">
                 <div className="flex items-center justify-between px-4 py-4 bg-gray-900 rounded-2xl">
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-cyan-400 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 gradient-secondary rounded-full flex items-center justify-center">
                       <User className="w-5 h-5 text-black" />
                     </div>
                     <div>

@@ -1,8 +1,26 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import NavigationWrapper from '@/components/ui/NavigationWrapper'
+import ThemeSwitcher from '@/components/ui/ThemeSwitcher'
+import { useEffect, useState } from 'react'
 
 export default function Home() {
+  const [scrollY, setScrollY] = useState(0)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Calculate parallax offset - moves slower than scroll
+  const parallaxOffset = scrollY * 0.5
+
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
       <NavigationWrapper />
@@ -11,7 +29,12 @@ export default function Home() {
       <div className="relative min-h-screen flex items-center justify-center px-6 lg:px-8 overflow-hidden">
         {/* Background Hero Image */}
         <div className="absolute inset-0 z-0 overflow-hidden">
-          <div className="hero-parallax-container h-[120%] w-full absolute -top-[10%]">
+          <div 
+            className="hero-parallax-container h-[120%] w-full absolute -top-[10%]"
+            style={{
+              transform: `translateY(${parallaxOffset}px)`,
+            }}
+          >
             <Image
               src="/images/homepage/hero_mast.jpg"
               alt="Rock star kids background"
@@ -65,18 +88,18 @@ export default function Home() {
             <div className="space-y-8 relative z-20 lg:w-[65%]">
               <h1 className="text-6xl md:text-8xl lg:text-9xl font-black leading-none tracking-tight">
                 <span className="block text-white">THE</span>
-                <span className="block bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent">
+                <span className="block text-gradient-primary">
                   ALTERNATIVE
                 </span>
                 <span className="block text-white">TO BORING</span>
-                <span className="block bg-gradient-to-r from-pink-500 to-cyan-400 bg-clip-text text-transparent">
+                <span className="block text-gradient-secondary">
                   PHOTO STUDIOS
                 </span>
               </h1>
               
               {/* Scrolling text banner */}
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-pink-500 h-12 -skew-y-1"></div>
+                <div className="absolute inset-0 gradient-primary h-12 -skew-y-1"></div>
                 <div className="relative flex items-center h-12 overflow-hidden">
                   <div className="animate-marquee whitespace-nowrap">
                     <span className="text-black font-bold text-lg mx-4">ROCK STAR KIDS //</span>
@@ -92,7 +115,7 @@ export default function Home() {
               <div className="pt-8">
                 <Link
                   href="/packages"
-                  className="inline-block px-8 py-4 text-xl font-bold text-black bg-gradient-to-r from-cyan-400 to-pink-500 rounded-full hover:scale-105 transition-transform duration-300"
+                  className="inline-block px-8 py-4 text-xl font-bold text-black gradient-primary rounded-full hover:scale-105 transition-transform duration-300"
                 >
                   BOOK A SESSION
                 </Link>
@@ -215,8 +238,8 @@ export default function Home() {
                   </div>
                   
                   {/* Decorative grunge elements */}
-                  <div className="absolute -top-6 -right-6 w-20 h-20 bg-gradient-to-r from-pink-500 to-cyan-400 rounded-full opacity-70 blur-sm"></div>
-                  <div className="absolute -bottom-8 -left-8 w-16 h-16 bg-gradient-to-r from-cyan-400 to-pink-500 rotate-45 opacity-50"></div>
+                  <div className="absolute -top-6 -right-6 w-20 h-20 gradient-secondary rounded-full opacity-70 blur-sm"></div>
+                  <div className="absolute -bottom-8 -left-8 w-16 h-16 gradient-primary rotate-45 opacity-50"></div>
                   
                   {/* Vintage photo corner tears */}
                   <div className="absolute top-0 right-0 w-10 h-10 bg-black transform rotate-45 translate-x-5 -translate-y-5 opacity-40"></div>
@@ -229,7 +252,7 @@ export default function Home() {
             <div className="space-y-12">
               <div>
                 <h2 className="text-5xl md:text-6xl font-black text-white mb-8">THE GIST</h2>
-                <p className="text-gray-300 text-lg leading-relaxed font-oswald">
+                <p className="text-gray-300 text-lg leading-relaxed font-figtree">
                   Electric Muse is the alternative to boring photo studios and cookie-cutter portraits. 
                   Think of it as therapy for parents tired of stiff, artificial photos where kids are 
                   told to sit still and smile. We're an edgy collective of photographers, stylists, 
@@ -239,37 +262,37 @@ export default function Home() {
               
               <div className="space-y-8">
                 <div className="border-b border-gray-700 pb-4">
-                  <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent mb-2">
+                  <h3 className="text-2xl font-bold text-gradient-primary mb-2">
                     WHAT WE DO
                   </h3>
-                  <p className="text-gray-300 font-oswald">
+                  <p className="text-gray-300 font-figtree">
                     Transform your kids into rock stars with professional styling, instruments, and attitude coaching.
                   </p>
                 </div>
                 
                 <div className="border-b border-gray-700 pb-4">
-                  <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent mb-2">
+                  <h3 className="text-2xl font-bold text-gradient-primary mb-2">
                     HOW WE DO IT
                   </h3>
-                  <p className="text-gray-300 font-oswald">
+                  <p className="text-gray-300 font-figtree">
                     Through authentic styling, real instruments, smoke machines, and letting kids be their wildest selves.
                   </p>
                 </div>
                 
                 <div className="border-b border-gray-700 pb-4">
-                  <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent mb-2">
+                  <h3 className="text-2xl font-bold text-gradient-primary mb-2">
                     WHERE WE DO IT
                   </h3>
-                  <p className="text-gray-300 font-oswald">
+                  <p className="text-gray-300 font-figtree">
                     Professional studio with authentic rock stage setup and lighting.
                   </p>
                 </div>
                 
                 <div>
-                  <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent mb-2">
+                  <h3 className="text-2xl font-bold text-gradient-primary mb-2">
                     WHEN WE DO IT
                   </h3>
-                  <p className="text-gray-300 font-oswald">
+                  <p className="text-gray-300 font-figtree">
                     Year-round sessions with seasonal rock themes and special events.
                   </p>
                 </div>
@@ -284,10 +307,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <h2 className="text-6xl md:text-8xl font-black mb-16">
             <span className="block text-white">NEXT SESSION</span>
-            <span className="block bg-gradient-to-r from-pink-500 to-cyan-400 bg-clip-text text-transparent">
+            <span className="block text-gradient-secondary">
               EXPERIENCES THAT EXCEED
             </span>
-            <span className="block bg-gradient-to-r from-pink-500 to-cyan-400 bg-clip-text text-transparent">
+            <span className="block text-gradient-secondary">
               EXPECTATIONS
             </span>
           </h2>
@@ -302,18 +325,18 @@ export default function Home() {
               </div>
               
               <div>
-                <h3 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent mb-4">
+                <h3 className="text-3xl font-bold text-gradient-primary mb-4">
                   ROCK STAR EXPERIENCE '25
                 </h3>
-                <p className="text-gray-300 text-lg mb-2 font-oswald">Available year-round @ studio sessions</p>
-                <p className="text-gray-300 text-lg font-oswald">
+                <p className="text-gray-300 text-lg mb-2 font-figtree">Available year-round @ studio sessions</p>
+                <p className="text-gray-300 text-lg font-figtree">
                   <span className="underline">Professional Photography Studio</span> - Your Location
                 </p>
               </div>
               
               <Link
                 href="/packages"
-                className="inline-block px-8 py-4 text-lg font-bold text-black bg-gradient-to-r from-cyan-400 to-pink-500 rounded-full hover:scale-105 transition-transform duration-300"
+                className="inline-block px-8 py-4 text-lg font-bold text-black gradient-primary rounded-full hover:scale-105 transition-transform duration-300"
               >
                 VIEW PACKAGES
               </Link>
@@ -328,7 +351,7 @@ export default function Home() {
             {/* Right - TV/Monitor Graphic */}
             <div className="relative">
               {/* Decorative badge */}
-              <div className="absolute -top-8 -right-8 w-32 h-32 bg-gradient-to-r from-pink-500 to-cyan-400 rounded-full flex items-center justify-center transform -rotate-12 z-20">
+              <div className="absolute -top-8 -right-8 w-32 h-32 gradient-secondary rounded-full flex items-center justify-center transform -rotate-12 z-20">
                 <div className="text-center">
                   <div className="text-black font-black text-sm">IT WAS</div>
                   <div className="text-black font-black text-sm">AWESOME</div>
@@ -368,7 +391,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <h2 className="text-5xl md:text-7xl font-black text-center mb-16">
             <span className="block text-white">THIS IS HOW WE'VE</span>
-            <span className="block bg-gradient-to-r from-pink-500 to-cyan-400 bg-clip-text text-transparent">
+            <span className="block text-gradient-secondary">
               BEEN ROCKING
             </span>
           </h2>
@@ -400,7 +423,7 @@ export default function Home() {
           <div className="text-center mt-12">
             <Link
               href="/shop"
-              className="inline-block px-8 py-4 text-lg font-bold text-black bg-gradient-to-r from-cyan-400 to-pink-500 rounded-full hover:scale-105 transition-transform duration-300"
+              className="inline-block px-8 py-4 text-lg font-bold text-black gradient-primary rounded-full hover:scale-105 transition-transform duration-300"
             >
               VIEW GALLERY
             </Link>
@@ -451,7 +474,7 @@ export default function Home() {
           <h2 className="text-5xl md:text-6xl font-black text-white mb-8">
             WANT TO GET INVOLVED?
           </h2>
-          <p className="text-gray-300 text-xl mb-12 font-oswald">
+          <p className="text-gray-300 text-xl mb-12 font-figtree">
             Ready to transform your little one into a rock legend?
           </p>
           
@@ -496,7 +519,7 @@ export default function Home() {
             
             <Link
               href="/packages"
-              className="inline-block px-12 py-4 text-xl font-bold text-black bg-gradient-to-r from-cyan-400 to-pink-500 rounded-full hover:scale-105 transition-transform duration-300"
+              className="inline-block px-12 py-4 text-xl font-bold text-black gradient-primary rounded-full hover:scale-105 transition-transform duration-300"
             >
               BOOK NOW
             </Link>
@@ -509,7 +532,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-cyan-400 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 gradient-secondary rounded-full flex items-center justify-center">
                 <span className="text-black font-black text-xl">EM</span>
               </div>
               <span className="text-white font-bold text-xl">ELECTRIC MUSE</span>
@@ -529,6 +552,8 @@ export default function Home() {
         </div>
       </footer>
       
+      {/* Theme Switcher for Testing */}
+      <ThemeSwitcher />
     </div>
   )
 }

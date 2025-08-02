@@ -8,7 +8,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'oswald': ['var(--font-oswald)', 'sans-serif'],
+        'figtree': ['var(--font-figtree)', 'sans-serif'],
       },
       colors: {
         // Punk Rock Color Palette using CSS variables

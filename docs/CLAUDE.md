@@ -35,11 +35,21 @@
 
 ### ✅ Phase 5.5: Agency Side Design Transformation (COMPLETED)
 - Complete homepage redesign inspired by agencyside.org
-- Bold typography system with Oswald font implementation
+- Bold typography system with Figtree font implementation
 - Cyan/pink gradient color palette throughout
 - Navigation redesign with gradient pill buttons
 - Hero section with parallax background and grunge effects
 - Halftone photo styling and starburst decorative elements
+
+### ✅ Phase 5.6: Enhanced Design System (COMPLETED)
+- Fixed Figtree font implementation using Tailwind utilities
+- Updated packages page with Agency Side aesthetic
+- Changed hero title to "CHOOSE YOUR ELECTRIC PACKAGE"
+- Implemented theme switching system for easy color testing
+- Created two themes: Default (Cyan #07BFDD/Hot Pink #FF1493) and Red (Dark Red #8B0000/Crimson #DC143C)
+- Added floating theme switcher component for one-click testing
+- Converted parallax from constant animation to scroll-based effect (0.5x speed)
+- Fixed color issues: Hot pink restored from peachy tone, red theme made darker/bolder
 
 ### 🔄 Next: Phase 6 Dashboard & Auth Pages
 - Apply Agency Side design system to dashboard and booking pages
@@ -60,7 +70,7 @@
 - **Agency Side Inspiration**: Redesigned homepage to match agencyside.org aesthetic with bold typography and dynamic layouts
 - **Navigation Redesign**: Complete overhaul with gradient pill buttons, circular logo design, and bold font styling
 - **Hero Section Enhancement**: Added parallax background image with horizontal gradient overlay and grunge torn edge effects
-- **Typography Upgrade**: Implemented Oswald font for punk rock aesthetic while maintaining readability
+- **Typography Upgrade**: Implemented Figtree font for punk rock aesthetic while maintaining readability
 - **Color System Overhaul**: Migrated from initial punk rock palette to cyan/pink gradient system matching Agency Side
 - **Visual Effects**: Added halftone effects, starburst graphics, and distressed image styling
 
@@ -94,24 +104,49 @@
 
 ## 🎨 Design System (Agency Side Inspired)
 
-### Color Palette
+### Color Palette & Theme System
+
+#### Default Theme (Cyan/Pink)
 ```css
 /* Primary Brand Colors */
---color-cyan: #07BFDD;     /* Primary accent - buttons, highlights */
---color-pink: #F6676C;     /* Secondary accent - gradients, CTAs */
---color-black: #000000;    /* Primary background */
---color-white: #FFFFFF;    /* Primary text on dark backgrounds */
+--theme-primary: #07BFDD;    /* Cyan - Primary accent */
+--theme-secondary: #FF1493;   /* Hot Pink - Secondary accent (updated from #F6676C) */
+--color-black: #000000;       /* Primary background */
+--color-white: #FFFFFF;       /* Primary text on dark backgrounds */
 
 /* Gradient Combinations */
-background: linear-gradient(to right, #07BFDD, #F6676C);  /* Cyan to Pink */
-background: linear-gradient(to right, #F6676C, #07BFDD);  /* Pink to Cyan */
+--gradient-primary: linear-gradient(to right, #07BFDD, #FF1493);
+--gradient-secondary: linear-gradient(to right, #FF1493, #07BFDD);
+```
+
+#### Alternative Theme (Red/Black)
+```css
+/* Red Theme Colors */
+--theme-primary: #8B0000;     /* Dark Red - Primary accent */
+--theme-secondary: #DC143C;   /* Crimson - Secondary accent */
+
+/* Gradient Combinations */
+--gradient-primary: linear-gradient(to right, #8B0000, #DC143C);
+--gradient-secondary: linear-gradient(to right, #DC143C, #8B0000);
+```
+
+#### Theme Implementation
+```css
+/* Theme-aware classes for easy switching */
+.gradient-primary { background: var(--gradient-primary); }
+.gradient-secondary { background: var(--gradient-secondary); }
+.text-gradient-primary { 
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 ```
 
 ### Typography
 ```css
-/* Primary Font: Oswald (Google Fonts) */
+/* Primary Font: Figtree (Google Fonts) */
 .punk-text {
-  font-family: var(--font-oswald);
+  font-family: var(--font-figtree);
   font-weight: 400;
   letter-spacing: 0.02em;
 }
@@ -154,6 +189,17 @@ h1, h2, h3 { font-weight: 900; } /* Ultra bold for impact */
 - **Image Overlays**: Multiple blend modes for authentic grunge texture
 - **Z-Index Hierarchy**: Proper layering for complex visual compositions
 - **Responsive Scaling**: Typography scales dramatically on larger screens
+- **Scroll-based Parallax**: Hero background moves at 0.5x scroll speed
+- **Grunge Edge Effects**: Torn paper effect using radial gradients
+- **Theme Switcher**: Floating button for instant theme testing
+- **Halftone Effects**: Comic book style dot patterns on images
+
+### Key Updates & Fixes
+- **Typography Fix**: Figtree font now properly implemented via Tailwind utilities (`font-figtree`)
+- **Color Corrections**: Hot pink (#FF1493) restored from peachy tone, red theme darkened
+- **Parallax Update**: Changed from constant animation to scroll-based movement
+- **Package Page Title**: Updated to "CHOOSE YOUR ELECTRIC PACKAGE"
+- **Theme System**: CSS variables enable instant color scheme switching
 
 ## Environment Setup
 

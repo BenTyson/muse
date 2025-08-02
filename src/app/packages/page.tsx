@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import ThemeSwitcher from '@/components/ui/ThemeSwitcher'
 
 interface PackageAddon {
   id: string
@@ -74,10 +75,10 @@ export default function PackagesPage() {
                   }}
                 />
               ))}
-              <div className="absolute top-1/2 left-1/2 w-4 h-4 bg-gradient-to-r from-pink-500 to-cyan-400 rounded-full transform -translate-x-1/2 -translate-y-1/2 animate-pulse"></div>
+              <div className="absolute top-1/2 left-1/2 w-4 h-4 gradient-secondary rounded-full transform -translate-x-1/2 -translate-y-1/2 animate-pulse"></div>
             </div>
           </div>
-          <p className="mt-6 text-white font-oswald text-lg">LOADING PACKAGES...</p>
+          <p className="mt-6 text-white font-figtree text-lg">LOADING PACKAGES...</p>
         </div>
       </div>
     )
@@ -88,10 +89,10 @@ export default function PackagesPage() {
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-3xl font-black text-white mb-4">SOMETHING WENT WRONG</h2>
-          <p className="text-gray-300 font-oswald mb-6">Error: {error}</p>
+          <p className="text-gray-300 font-figtree mb-6">Error: {error}</p>
           <button 
             onClick={() => window.location.reload()}
-            className="px-8 py-4 text-lg font-bold text-black bg-gradient-to-r from-cyan-400 to-pink-500 rounded-full hover:scale-105 transition-transform duration-300"
+            className="px-8 py-4 text-lg font-bold text-black gradient-primary rounded-full hover:scale-105 transition-transform duration-300"
           >
             TRY AGAIN
           </button>
@@ -142,7 +143,7 @@ export default function PackagesPage() {
         <div className="max-w-7xl mx-auto text-center relative z-10">
           <h1 className="text-6xl md:text-8xl lg:text-9xl font-black leading-none tracking-tight mb-8">
             <span className="block text-white">CHOOSE YOUR</span>
-            <span className="block bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent">
+            <span className="block gradient-primary bg-clip-text text-transparent">
               ELECTRIC
             </span>
             <span className="block text-white">PACKAGE</span>
@@ -150,7 +151,7 @@ export default function PackagesPage() {
           
           {/* Scrolling text banner */}
           <div className="relative my-12">
-            <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-cyan-400 h-12 -skew-y-1"></div>
+            <div className="absolute inset-0 gradient-secondary h-12 -skew-y-1"></div>
             <div className="relative flex items-center h-12 overflow-hidden">
               <div className="animate-marquee whitespace-nowrap">
                 <span className="text-black font-bold text-lg mx-4">PROFESSIONAL STYLING //</span>
@@ -162,7 +163,7 @@ export default function PackagesPage() {
             </div>
           </div>
           
-          <p className="text-xl text-gray-300 font-oswald max-w-3xl mx-auto">
+          <p className="text-xl text-gray-300 font-figtree max-w-3xl mx-auto">
             Transform your little one into a rock legend with our professional photography packages. 
             Each session includes styling, instruments, and attitude coaching.
           </p>
@@ -198,7 +199,7 @@ export default function PackagesPage() {
               {/* Package Card */}
               <div className="relative bg-gradient-to-br from-gray-900 to-black border-2 border-gray-800 rounded-3xl overflow-hidden group-hover:border-pink-500/50 transition-all duration-300 group-hover:scale-105">
                 {/* Price badge */}
-                <div className="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-r from-pink-500 to-cyan-400 rounded-full flex items-center justify-center transform rotate-12 z-20">
+                <div className="absolute -top-4 -right-4 w-20 h-20 gradient-secondary rounded-full flex items-center justify-center transform rotate-12 z-20">
                   <div className="text-center">
                     <div className="text-black font-black text-xs">${pkg.basePrice}</div>
                   </div>
@@ -206,12 +207,12 @@ export default function PackagesPage() {
 
                 <div className="p-8">
                   {/* Package Name */}
-                  <h3 className="text-3xl font-black text-white mb-4 bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent">
+                  <h3 className="text-3xl font-black text-white mb-4 gradient-primary bg-clip-text text-transparent">
                     {pkg.name.toUpperCase()}
                   </h3>
                   
                   {/* Description */}
-                  <p className="text-gray-300 font-oswald text-lg mb-8 leading-relaxed">
+                  <p className="text-gray-300 font-figtree text-lg mb-8 leading-relaxed">
                     {pkg.shortDescription}
                   </p>
                   
@@ -219,35 +220,35 @@ export default function PackagesPage() {
                   <div className="space-y-4 mb-8">
                     <div className="flex items-center">
                       <div className="w-2 h-2 bg-cyan-400 rounded-full mr-4"></div>
-                      <span className="text-white font-oswald">{pkg.durationMinutes} MINUTE SESSION</span>
+                      <span className="text-white font-figtree">{pkg.durationMinutes} MINUTE SESSION</span>
                     </div>
                     
                     <div className="flex items-center">
                       <div className="w-2 h-2 bg-pink-500 rounded-full mr-4"></div>
-                      <span className="text-white font-oswald">UP TO {pkg.maxChildren} {pkg.maxChildren === 1 ? 'CHILD' : 'CHILDREN'}</span>
+                      <span className="text-white font-figtree">UP TO {pkg.maxChildren} {pkg.maxChildren === 1 ? 'CHILD' : 'CHILDREN'}</span>
                     </div>
                     
                     <div className="flex items-center">
                       <div className="w-2 h-2 bg-cyan-400 rounded-full mr-4"></div>
-                      <span className="text-white font-oswald">{pkg.includedPhotos} EDITED DIGITAL PHOTOS</span>
+                      <span className="text-white font-figtree">{pkg.includedPhotos} EDITED DIGITAL PHOTOS</span>
                     </div>
                     
                     {pkg.includesStyling && (
                       <div className="flex items-center">
                         <div className="w-2 h-2 bg-pink-500 rounded-full mr-4"></div>
-                        <span className="text-white font-oswald">PROFESSIONAL STYLING INCLUDED</span>
+                        <span className="text-white font-figtree">PROFESSIONAL STYLING INCLUDED</span>
                       </div>
                     )}
                     
                     <div className="flex items-center">
                       <div className="w-2 h-2 bg-cyan-400 rounded-full mr-4"></div>
-                      <span className="text-white font-oswald">{pkg.maxOutfitChanges} OUTFIT {pkg.maxOutfitChanges === 1 ? 'CHANGE' : 'CHANGES'}</span>
+                      <span className="text-white font-figtree">{pkg.maxOutfitChanges} OUTFIT {pkg.maxOutfitChanges === 1 ? 'CHANGE' : 'CHANGES'}</span>
                     </div>
                     
                     {pkg.includesPrint && pkg.printSize && (
                       <div className="flex items-center">
                         <div className="w-2 h-2 bg-pink-500 rounded-full mr-4"></div>
-                        <span className="text-white font-oswald">COMPLIMENTARY {pkg.printSize.toUpperCase()} PRINT</span>
+                        <span className="text-white font-figtree">COMPLIMENTARY {pkg.printSize.toUpperCase()} PRINT</span>
                       </div>
                     )}
                   </div>
@@ -255,13 +256,13 @@ export default function PackagesPage() {
                   {/* Add-ons */}
                   {pkg.addons && pkg.addons.length > 0 && (
                     <div className="mb-8 p-4 bg-black/50 rounded-2xl border border-gray-700">
-                      <h4 className="text-lg font-bold text-white mb-3 bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent">
+                      <h4 className="text-lg font-bold text-white mb-3 gradient-primary bg-clip-text text-transparent">
                         AVAILABLE ADD-ONS
                       </h4>
                       <div className="space-y-2">
                         {pkg.addons.map((addon) => (
                           <div key={addon.id} className="flex justify-between text-sm">
-                            <span className="text-gray-300 font-oswald">{addon.name}</span>
+                            <span className="text-gray-300 font-figtree">{addon.name}</span>
                             <span className="text-white font-bold">+${addon.price}</span>
                           </div>
                         ))}
@@ -271,14 +272,14 @@ export default function PackagesPage() {
 
                   {/* Full Description */}
                   {pkg.description && (
-                    <p className="text-gray-400 font-oswald text-sm mb-8 leading-relaxed">
+                    <p className="text-gray-400 font-figtree text-sm mb-8 leading-relaxed">
                       {pkg.description}
                     </p>
                   )}
 
                   {/* Book Button */}
                   <Link href={`/booking?package=${pkg.slug}`} className="block">
-                    <button className="w-full px-8 py-4 text-lg font-bold text-black bg-gradient-to-r from-cyan-400 to-pink-500 rounded-full hover:scale-105 transition-transform duration-300">
+                    <button className="w-full px-8 py-4 text-lg font-bold text-black gradient-primary rounded-full hover:scale-105 transition-transform duration-300">
                       BOOK THIS PACKAGE
                     </button>
                   </Link>
@@ -293,16 +294,19 @@ export default function PackagesPage() {
           <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
             READY TO ROCK?
           </h2>
-          <p className="text-gray-300 font-oswald text-xl mb-8 max-w-2xl mx-auto">
+          <p className="text-gray-300 font-figtree text-xl mb-8 max-w-2xl mx-auto">
             Can't decide? Our team can help you choose the perfect package for your rock star.
           </p>
           <Link href="/contact">
-            <button className="px-12 py-4 text-xl font-bold text-black bg-gradient-to-r from-pink-500 to-cyan-400 rounded-full hover:scale-105 transition-transform duration-300">
+            <button className="px-12 py-4 text-xl font-bold text-black gradient-secondary rounded-full hover:scale-105 transition-transform duration-300">
               GET HELP CHOOSING
             </button>
           </Link>
         </div>
       </div>
+      
+      {/* Theme Switcher for Testing */}
+      <ThemeSwitcher />
     </div>
   )
 }

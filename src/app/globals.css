@@ -3,31 +3,39 @@
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --font-oswald: var(--font-oswald);
+  --font-figtree: var(--font-figtree);
 }
 
-/* Punk Rock Color Palette CSS Variables */
+/* Theme System - Default: Cyan/Pink Theme */
 :root {
-  /* Base colors as RGB values for Tailwind opacity support */
-  --color-rose-red: 185 32 86;           /* #B92056 */
-  --color-flame: 232 86 39;              /* #E85627 */
-  --color-maximum-yellow-red: 240 181 77; /* #F0B54D */
-  --color-palatinate-purple: 104 41 87;   /* #682957 */
-  --color-green-sheen: 103 185 169;      /* #67B9A9 */
-  --color-metallic-blue: 43 89 131;      /* #2B5983 */
+  /* Agency Side Inspired - Cyan/Pink Theme (DEFAULT) */
+  --theme-primary: 7 191 221;        /* Cyan #07BFDD */
+  --theme-secondary: 255 20 147;     /* Hot Pink #FF1493 - More vibrant! */
+  --theme-accent: 255 20 147;        /* Hot Pink accent */
   
-  /* Semantic mappings */
-  --color-primary: var(--color-rose-red);
-  --color-primary-dark: 165 24 71;       /* darken rose-red 10% */
-  --color-primary-light: 206 56 110;     /* lighten rose-red 15% */
+  /* Theme gradients - for easy switching */
+  --gradient-primary: linear-gradient(to right, rgb(7, 191, 221), rgb(255, 20, 147));
+  --gradient-secondary: linear-gradient(to right, rgb(255, 20, 147), rgb(7, 191, 221));
   
-  --color-secondary: var(--color-metallic-blue);
-  --color-secondary-dark: 33 72 112;     /* darken metallic-blue 10% */
-  --color-secondary-light: 63 117 160;   /* lighten metallic-blue 15% */
+  /* Legacy color mappings for existing code */
+  --color-rose-red: 185 32 86;           
+  --color-flame: 232 86 39;              
+  --color-maximum-yellow-red: 240 181 77; 
+  --color-palatinate-purple: 104 41 87;   
+  --color-green-sheen: 103 185 169;      
+  --color-metallic-blue: 43 89 131;      
   
-  --color-accent: var(--color-flame);
-  --color-accent-dark: 209 68 31;        /* darken flame 10% */
-  --color-accent-light: 245 121 79;      /* lighten flame 15% */
+  --color-primary: var(--theme-primary);
+  --color-primary-dark: 5 153 177;       /* darker cyan */
+  --color-primary-light: 64 206 235;     /* lighter cyan */
+  
+  --color-secondary: var(--theme-secondary);
+  --color-secondary-dark: 199 21 133;    /* darker hot pink */
+  --color-secondary-light: 255 105 180;  /* lighter hot pink */
+  
+  --color-accent: var(--theme-accent);
+  --color-accent-dark: 199 21 133;        
+  --color-accent-light: 255 105 180;     
   
   --color-warning: var(--color-maximum-yellow-red);
   --color-success: var(--color-green-sheen);
@@ -43,6 +51,56 @@
   --color-gray-700: 45 55 72;
   --color-gray-800: 26 32 44;
   --color-gray-900: 23 25 35;
+}
+
+/* Alternative Theme: Red/Black/White */
+.theme-red {
+  /* Red Theme Override - Darker and Bolder */
+  --theme-primary: 139 0 0;          /* Dark Red #8B0000 */
+  --theme-secondary: 220 20 60;      /* Crimson #DC143C */
+  --theme-accent: 220 20 60;         /* Crimson accent */
+  
+  /* Theme gradients */
+  --gradient-primary: linear-gradient(to right, rgb(139, 0, 0), rgb(220, 20, 60));
+  --gradient-secondary: linear-gradient(to right, rgb(220, 20, 60), rgb(139, 0, 0));
+  
+  /* Override main theme colors */
+  --color-primary: var(--theme-primary);
+  --color-primary-dark: 80 0 0;          /* even darker red */
+  --color-primary-light: 178 34 34;      /* firebrick */
+  
+  --color-secondary: var(--theme-secondary);
+  --color-secondary-dark: 139 0 0;       /* dark red */
+  --color-secondary-light: 255 69 0;     /* red-orange */
+  
+  --color-accent: var(--theme-accent);
+  --color-accent-dark: 139 0 0;        
+  --color-accent-light: 255 69 0;     
+}
+
+/* Theme-aware gradient classes */
+.gradient-primary {
+  background: var(--gradient-primary);
+}
+
+.gradient-secondary {
+  background: var(--gradient-secondary);
+}
+
+.text-gradient-primary {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.text-gradient-secondary {
+  background: var(--gradient-secondary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 body {
@@ -65,32 +123,6 @@ body {
 .hero-parallax-container {
   transform: translateZ(0);
   will-change: transform;
-}
-
-/* Create parallax on scroll */
-@media (prefers-reduced-motion: no-preference) {
-  .hero-parallax-container {
-    animation: parallax-float 6s ease-in-out infinite;
-  }
-}
-
-@keyframes parallax-float {
-  0% {
-    transform: translateY(0px) scale(1);
-  }
-  50% {
-    transform: translateY(-30px) scale(1.05);
-  }
-  100% {
-    transform: translateY(0px) scale(1);
-  }
-}
-
-/* Respect user's motion preferences */
-@media (prefers-reduced-motion: reduce) {
-  .hero-parallax-container {
-    animation: none;
-    transform: none;
-  }
+  transition: transform 0.3s ease-out;
 }
 
