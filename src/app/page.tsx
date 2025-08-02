@@ -13,7 +13,7 @@ export default function Home() {
         <div className="relative z-10 w-full max-w-7xl mx-auto pt-20">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Side - Typography */}
-            <div className="space-y-8">
+            <div className="space-y-8 relative z-20">
               <h1 className="text-6xl md:text-8xl lg:text-9xl font-black leading-none tracking-tight">
                 <span className="block text-white">THE</span>
                 <span className="block bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent">
@@ -51,7 +51,7 @@ export default function Home() {
             </div>
             
             {/* Right Side - Hero Image with decorative elements */}
-            <div className="relative">
+            <div className="relative z-10">
               {/* Starburst decoration */}
               <div className="absolute -top-20 -right-20 w-80 h-80 opacity-30">
                 <div className="relative w-full h-full">
@@ -99,9 +99,9 @@ export default function Home() {
       <div className="py-24 px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left - Decorative Eye Graphic */}
+            {/* Left - Grunge Styled Elodi Photo */}
             <div className="relative">
-              {/* Starburst behind eye */}
+              {/* Starburst behind photo */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="relative w-96 h-96">
                   {Array.from({ length: 32 }).map((_, i) => (
@@ -119,12 +119,78 @@ export default function Home() {
                 </div>
               </div>
               
-              {/* Eye graphic */}
+              {/* Grunge Photo Container */}
               <div className="relative z-10 flex items-center justify-center">
-                <div className="w-80 h-80 bg-gradient-to-br from-gray-200 to-white rounded-full flex items-center justify-center">
-                  <div className="w-32 h-20 bg-black rounded-full relative overflow-hidden">
-                    <div className="absolute top-2 left-8 w-8 h-8 bg-white rounded-full"></div>
+                <div className="relative w-[500px] h-[500px]">
+                  {/* Multiple layered frames for grunge effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-pink-500/30 to-cyan-400/30 rounded-3xl transform rotate-2"></div>
+                  <div className="absolute inset-3 bg-gradient-to-tl from-cyan-400/20 to-pink-500/20 rounded-2xl transform -rotate-1"></div>
+                  
+                  {/* Main photo container with distressed edges */}
+                  <div className="relative w-full h-full overflow-hidden rounded-2xl transform rotate-1">
+                    {/* Photo */}
+                    <Image
+                      src="/images/homepage/elodi.JPG"
+                      alt="Elodi rock star transformation"
+                      fill
+                      className="object-cover"
+                    />
+                    
+                    {/* Halftone effect overlay */}
+                    <div 
+                      className="absolute inset-0 opacity-60 mix-blend-multiply"
+                      style={{
+                        backgroundImage: `
+                          radial-gradient(circle at 0% 0%, transparent 1px, rgba(0,0,0,0.8) 1px, rgba(0,0,0,0.8) 2px, transparent 2px),
+                          radial-gradient(circle at 50% 50%, transparent 1px, rgba(0,0,0,0.6) 1px, rgba(0,0,0,0.6) 2px, transparent 2px),
+                          radial-gradient(circle at 100% 100%, transparent 1px, rgba(0,0,0,0.7) 1px, rgba(0,0,0,0.7) 2px, transparent 2px)
+                        `,
+                        backgroundSize: '8px 8px, 12px 12px, 6px 6px',
+                        backgroundPosition: '0 0, 4px 4px, 2px 2px'
+                      }}
+                    ></div>
+                    
+                    {/* Color halftone effect */}
+                    <div 
+                      className="absolute inset-0 opacity-40 mix-blend-overlay"
+                      style={{
+                        backgroundImage: `
+                          radial-gradient(circle at 25% 25%, transparent 1px, rgba(232,86,39,0.3) 1px, rgba(232,86,39,0.3) 2px, transparent 2px),
+                          radial-gradient(circle at 75% 75%, transparent 1px, rgba(7,191,221,0.3) 1px, rgba(7,191,221,0.3) 2px, transparent 2px),
+                          radial-gradient(circle at 50% 25%, transparent 1px, rgba(246,103,108,0.2) 1px, rgba(246,103,108,0.2) 2px, transparent 2px)
+                        `,
+                        backgroundSize: '10px 10px, 14px 14px, 8px 8px',
+                        backgroundPosition: '0 0, 7px 7px, 4px 4px'
+                      }}
+                    ></div>
+                    
+                    {/* Grunge texture overlay */}
+                    <div 
+                      className="absolute inset-0 opacity-25 mix-blend-overlay"
+                      style={{
+                        backgroundImage: `
+                          radial-gradient(circle at 20% 80%, transparent 20%, rgba(0,0,0,0.4) 21%, rgba(0,0,0,0.4) 25%, transparent 26%),
+                          radial-gradient(circle at 80% 20%, transparent 20%, rgba(255,255,255,0.2) 21%, rgba(255,255,255,0.2) 25%, transparent 26%),
+                          radial-gradient(circle at 40% 40%, transparent 20%, rgba(0,0,0,0.3) 21%, rgba(0,0,0,0.3) 25%, transparent 26%)
+                        `
+                      }}
+                    ></div>
+                    
+                    {/* Gradient color overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 via-transparent to-cyan-400/20 mix-blend-color"></div>
+                    
+                    {/* Distressed border effect */}
+                    <div className="absolute inset-0 border-4 border-white/30 rounded-2xl"></div>
+                    <div className="absolute inset-2 border-2 border-black/40 rounded-xl"></div>
                   </div>
+                  
+                  {/* Decorative grunge elements */}
+                  <div className="absolute -top-6 -right-6 w-20 h-20 bg-gradient-to-r from-pink-500 to-cyan-400 rounded-full opacity-70 blur-sm"></div>
+                  <div className="absolute -bottom-8 -left-8 w-16 h-16 bg-gradient-to-r from-cyan-400 to-pink-500 rotate-45 opacity-50"></div>
+                  
+                  {/* Vintage photo corner tears */}
+                  <div className="absolute top-0 right-0 w-10 h-10 bg-black transform rotate-45 translate-x-5 -translate-y-5 opacity-40"></div>
+                  <div className="absolute bottom-0 left-0 w-8 h-8 bg-black transform rotate-45 -translate-x-4 translate-y-4 opacity-30"></div>
                 </div>
               </div>
             </div>
